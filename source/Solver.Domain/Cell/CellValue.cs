@@ -1,4 +1,4 @@
-﻿namespace SolverConsole.Cell;
+﻿namespace Solver.Domain.Cell;
 
 public readonly struct CellValue: IComparable<CellValue>, IComparable
 {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Immutable;
-using SolverConsole.Cell;
+using Solver.Domain.Cell;
 
-namespace SolverConsole.Board;
+namespace Solver.Domain.Board;
 
 public class GameBoard
 {

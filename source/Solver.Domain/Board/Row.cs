@@ -1,18 +1,18 @@
 ﻿using System.Collections;
-using SolverConsole.Cell;
+using Solver.Domain.Cell;
 
-namespace SolverConsole.Board;
+namespace Solver.Domain.Board;
 
 /// <summary>
-/// Indexed from left to right and then top to bottom
+/// indexed from left to right
 /// </summary>
-public readonly struct ThreeByThree : IReadOnlyCollection<ICell>
+public readonly struct Row : IReadOnlyCollection<ICell>
 {
-    public ThreeByThree(IEnumerable<ICell>  cells): this(cells as ICell[]?? cells.ToArray())
+    public Row(IEnumerable<ICell>  cells): this(cells as ICell[]?? cells.ToArray())
     {
     }
 
-    public ThreeByThree(params ICell[] cells)
+    public Row(params ICell[] cells)
     {
         if (cells.Length != 9)
         {
@@ -73,7 +73,7 @@ public readonly struct ThreeByThree : IReadOnlyCollection<ICell>
     }
 
     public int Count => 9;
-
+    
     public override string ToString()
     {
         return $"{A} {B} {C}{Environment.NewLine}{D} {E} {F}{Environment.NewLine}{G} {H} {I}";

@@ -1,18 +1,18 @@
 ﻿using System.Collections;
-using SolverConsole.Cell;
+using Solver.Domain.Cell;
 
-namespace SolverConsole.Board;
+namespace Solver.Domain.Board;
 
 /// <summary>
-/// indexed from left to right
+/// indexed from top to bottom
 /// </summary>
-public readonly struct Row : IReadOnlyCollection<ICell>
+public readonly struct Column : IReadOnlyCollection<ICell>
 {
-    public Row(IEnumerable<ICell>  cells): this(cells as ICell[]?? cells.ToArray())
+    public Column(IEnumerable<ICell>  cells): this(cells as ICell[]?? cells.ToArray())
     {
     }
 
-    public Row(params ICell[] cells)
+    public Column(params ICell[] cells)
     {
         if (cells.Length != 9)
         {

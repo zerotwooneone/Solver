@@ -1,7 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using SolverConsole.Board;
-using SolverConsole.Cell;
+using Solver.Domain.Board;
+using Solver.Domain.Cell;
 
 Console.WriteLine("Hello, World!");
 

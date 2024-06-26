@@ -1,4 +1,4 @@
-﻿namespace SolverConsole.Cell;
+﻿namespace Solver.Domain.Cell;
 
 public class SolvedCell(CellValue value) : ICell, IComparable
 {

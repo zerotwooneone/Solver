@@ -1,4 +1,4 @@
-﻿namespace SolverConsole.Cell;
+﻿namespace Solver.Domain.Cell;
 
 public class PartialCell(CellValue? value, RemainingCellValues remainingValues) : ICell, IComparable
 {
