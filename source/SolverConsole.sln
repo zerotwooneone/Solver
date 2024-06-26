@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolverConsole", "SolverConsole\SolverConsole.csproj", "{BF96D0E8-ABCB-47F8-8835-BFA81DF61959}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Solver.Domain", "Solver.Domain\Solver.Domain.csproj", "{4F08FF26-4F02-42D4-9155-47BF42F57530}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Solver.Domain.Tests", "Solver.Domain.Tests\Solver.Domain.Tests.csproj", "{FCF58089-6B6A-401E-A173-5C9AD3C8D1A8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BF96D0E8-ABCB-47F8-8835-BFA81DF61959}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF96D0E8-ABCB-47F8-8835-BFA81DF61959}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF96D0E8-ABCB-47F8-8835-BFA81DF61959}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF96D0E8-ABCB-47F8-8835-BFA81DF61959}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F08FF26-4F02-42D4-9155-47BF42F57530}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F08FF26-4F02-42D4-9155-47BF42F57530}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F08FF26-4F02-42D4-9155-47BF42F57530}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F08FF26-4F02-42D4-9155-47BF42F57530}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCF58089-6B6A-401E-A173-5C9AD3C8D1A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCF58089-6B6A-401E-A173-5C9AD3C8D1A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCF58089-6B6A-401E-A173-5C9AD3C8D1A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCF58089-6B6A-401E-A173-5C9AD3C8D1A8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
