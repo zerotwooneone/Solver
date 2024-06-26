@@ -1,6 +1,6 @@
 ﻿namespace SolverConsole.Cell;
 
-public interface ICell
+public interface ICell : IComparable<ICell>
 {
     public CellValue? Value { get; }
     public const string Blank = "_";

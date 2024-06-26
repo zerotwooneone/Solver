@@ -39,6 +39,7 @@ public readonly struct CellValue: IComparable<CellValue>, IComparable
 
     public override bool Equals(object? obj)
     {
-        return Value.Equals(obj);
+        if(!(obj is CellValue cv)) return false;
+        return Value.Equals(cv.Value);
     }
 }

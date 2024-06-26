@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Immutable;
 using SolverConsole.Cell;
 
 namespace SolverConsole.Board;
@@ -70,33 +70,34 @@ public class GameBoard
                  8 => column8,
                 _=> throw new ArgumentOutOfRangeException()
             };
-            column.AddRange(cells.Skip(positionIndex*rowSide).Take(rowSide));
 
             var outerColumnIndex = positionIndex;
             for (int outerRowIndex = 0; outerRowIndex < rowSide; outerRowIndex++)
             {
-                var rangeIndex = ((outerRowIndex / 3)*3) + (outerColumnIndex/3);
-
                 var cellIndex = outerColumnIndex+outerRowIndex*rowSide;
-                ranges[rangeIndex].Add(cells[cellIndex]);
+                var cell = cells[cellIndex];
+                column.Add(cell);
+                
+                var rangeIndex = ((outerRowIndex / 3)*3) + (outerColumnIndex/3);
+                ranges[rangeIndex].Add(cell);
             }
             
         }
 
-        Rows = new Row[]{new(row0), new(row1), new(row2), new(row3), new(row4), new(row5), new(row6), new(row7), new(row8)};
-        Columns = new Column[]{new(column0), new(column1), new(column2), new(column3), new(column4), new(column5), new(column6), new(column7), new(column8)};
-        Regions = ranges.Select(l=>new ThreeByThree(l)).ToArray();
+        Rows = [new Row(row0), new(row1), new(row2), new(row3), new(row4), new(row5), new(row6), new(row7), new(row8)];
+        Columns = [new Column(column0), new(column1), new(column2), new(column3), new(column4), new(column5), new(column6), new(column7), new(column8)];
+        Regions = [..ranges.Select(l=>new ThreeByThree(l)).ToArray()];
     }
     /// <summary>
     /// indexed from top to bottom
     /// </summary>
-    public IReadOnlyCollection<Row> Rows { get; }
+    public ImmutableArray<Row> Rows { get; }
     /// <summary>
     /// indexed from left to right
     /// </summary>
-    public IReadOnlyCollection<Column> Columns { get; }
+    public ImmutableArray<Column> Columns { get; }
     /// <summary>
     /// indexed from left to right and then top to bottom
     /// </summary>
-    public IReadOnlyCollection<ThreeByThree> Regions { get; }
+    public ImmutableArray<ThreeByThree> Regions { get; }
 }
