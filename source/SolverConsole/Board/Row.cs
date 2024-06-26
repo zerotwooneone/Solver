@@ -73,4 +73,9 @@ public readonly struct Row : IReadOnlyCollection<ICell>
     }
 
     public int Count => 9;
+    
+    public override string ToString()
+    {
+        return $"{A} {B} {C}{Environment.NewLine}{D} {E} {F}{Environment.NewLine}{G} {H} {I}";
+    }
 }

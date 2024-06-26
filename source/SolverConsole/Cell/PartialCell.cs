@@ -1,13 +1,16 @@
 ﻿namespace SolverConsole.Cell;
 
-public class PartialCell : ICell
+public class PartialCell(CellValue? value, RemainingCellValues remainingValues) : ICell
 {
-    public PartialCell(CellValue value, RemainingCellValues remainingValues)
-    {
-        Value = value;
-        State = SolveState.CreatePartialState(remainingValues);
-    }
+    public CellValue? Value { get; } = value;
+    public SolveState State { get; } = SolveState.CreatePartialState(remainingValues);
 
-    public CellValue? Value { get; }
-    public SolveState State { get; }
+    public override string ToString()
+    {
+        return Value.HasValue 
+            ? (Value.ToString()?.ToLower() ?? string.Empty)
+            : State.RemainingValues.Values.Count> 9
+            ? "+"
+            : State.RemainingValues.Values.Count.ToString();
+    }
 }
