@@ -18,15 +18,6 @@ public class BoardSolver
     private static (GameBoard gameBoard, bool doRecheck) GetSolvedBoard_Internal(GameBoard board)
     {
         var doRecheck = false;
-        Dictionary<int, HashSet<int>> exisingByRowIndex = board.Rows
-            .Select((r,i) => (i,r:new HashSet<int>(r.Where(c => c.Value.HasValue).Select(c=>(int)c.Value))))
-            .ToDictionary(c=>c.i,c=>c.r);
-        Dictionary<int, HashSet<int>> existingByColumnIndex = board.Columns
-            .Select((r,i) => (i,r:new HashSet<int>(r.Where(c => c.Value.HasValue).Select(c=>(int)c.Value))))
-            .ToDictionary(c=>c.i,c=>c.r);
-        Dictionary<int, HashSet<int>> existingByRegionIndex = board.Regions
-            .Select((r,i) => (i,r:new HashSet<int>(r.Where(c => c.Value.HasValue).Select(c=>(int)c.Value))))
-            .ToDictionary(c=>c.i,c=>c.r);
         
         const int boardSize = 9;
         var cells = new List<ICell>();
