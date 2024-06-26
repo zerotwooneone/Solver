@@ -21,13 +21,15 @@ for (int rowIndex = 0; rowIndex < b.Rows.Length; rowIndex++)
 {
     Console.WriteLine($"row {rowIndex} isValid/isSolved: {b.Rows[rowIndex].Check()}");
 }
-
+Console.WriteLine();
 for (int columnIndex = 0; columnIndex < b.Columns.Length; columnIndex++)
 {
     Console.WriteLine($"column {columnIndex} isValid/isSolved: {b.Columns[columnIndex].Check()}");
 }
-
+Console.WriteLine();
 for (int regionIndex = 0; regionIndex < b.Regions.Length; regionIndex++)
 {
     Console.WriteLine($"region {regionIndex} isValid/isSolved: {b.Regions[regionIndex].Check()}");
 }
+Console.WriteLine();
+Console.WriteLine($"isValid: {b.IsValid} isSolved:{b.IsSolved}");
