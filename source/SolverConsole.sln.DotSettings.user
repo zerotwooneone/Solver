@@ -1,4 +1,4 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=2fe0be86_002D3edc_002D4846_002Db156_002D8b2bb58df374/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;Solver.Domain.Tests&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;Project Location="C:\Users\squir\source\repos\PuzzleSolver\SolverConsole\source\Solver.Domain.Tests" Presentation="&amp;lt;Solver.Domain.Tests&amp;gt;" /&gt;&#xD;
+  &lt;Project Location="C:\Users\squir\source\repos\Solver\source\Solver.Domain.Tests" Presentation="&amp;lt;Solver.Domain.Tests&amp;gt;" /&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
