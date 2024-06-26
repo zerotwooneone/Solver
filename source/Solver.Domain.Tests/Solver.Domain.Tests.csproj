@@ -25,4 +25,10 @@
       <ProjectReference Include="..\Solver.Domain\Solver.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="Valid\solution.txt">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

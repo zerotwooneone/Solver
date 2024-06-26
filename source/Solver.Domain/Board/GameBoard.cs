@@ -10,6 +10,15 @@ public class GameBoard
     /// </summary>
     /// <param name="cells">cells must be in row major order</param>
     /// <exception cref="ArgumentException"></exception>
+    public GameBoard(IEnumerable<ICell> cells): this(cells as ICell[]?? cells.ToArray())
+    {
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="cells">cells must be in row major order</param>
+    /// <exception cref="ArgumentException"></exception>
     public GameBoard(params ICell[] cells)
     {
         if (cells.Length != 81)
