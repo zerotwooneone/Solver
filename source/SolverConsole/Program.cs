@@ -19,15 +19,15 @@ var b = new GameBoard(
 
 for (int rowIndex = 0; rowIndex < b.Rows.Length; rowIndex++)
 {
-    Console.WriteLine($"row {rowIndex} isValid: {b.Rows[rowIndex].Check()}");
+    Console.WriteLine($"row {rowIndex} isValid/isSolved: {b.Rows[rowIndex].Check()}");
 }
 
 for (int columnIndex = 0; columnIndex < b.Columns.Length; columnIndex++)
 {
-    Console.WriteLine($"column {columnIndex} isValid: {b.Columns[columnIndex].Check()}");
+    Console.WriteLine($"column {columnIndex} isValid/isSolved: {b.Columns[columnIndex].Check()}");
 }
 
 for (int regionIndex = 0; regionIndex < b.Regions.Length; regionIndex++)
 {
-    Console.WriteLine($"region {regionIndex} isValid: {b.Regions[regionIndex].Check()}");
+    Console.WriteLine($"region {regionIndex} isValid/isSolved: {b.Regions[regionIndex].Check()}");
 }
