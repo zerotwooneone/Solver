@@ -38,4 +38,14 @@ public static class NineCellExtensions
         }
         return (true, hash.Count == 9);;
     }
+
+    public static IEnumerable<ICell> GetValues(this IEnumerable<ICell>? cells)
+    {
+        if (cells == null)
+        {
+            return Array.Empty<ICell>();
+        }
+
+        return cells.Where(c => c.Value != null);
+    }
 }

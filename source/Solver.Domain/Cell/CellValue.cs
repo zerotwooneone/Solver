@@ -2,7 +2,7 @@
 
 public readonly struct CellValue: IComparable<CellValue>, IComparable
 {
-    public static readonly IReadOnlyCollection<CellValue> AllValues = new CellValue[]{1,2,3,4,5,6,7,8,9};
+    public static readonly IReadOnlyList<CellValue> AllValues = new CellValue[]{1,2,3,4,5,6,7,8,9};
     public CellValue(int value)
     {
         if (value < 1 || value > 9)

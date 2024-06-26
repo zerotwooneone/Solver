@@ -6,7 +6,7 @@ namespace Solver.Domain.Board;
 /// <summary>
 /// Indexed from left to right and then top to bottom
 /// </summary>
-public readonly struct ThreeByThree : IReadOnlyCollection<ICell>
+public readonly struct ThreeByThree : IReadOnlyList<ICell>
 {
     public ThreeByThree(IEnumerable<ICell>  cells): this(cells as ICell[]?? cells.ToArray())
     {

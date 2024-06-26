@@ -9,9 +9,7 @@ public class PartialCell(CellValue? value, RemainingCellValues remainingValues) 
     {
         return Value.HasValue 
             ? (Value.ToString()?.ToLower() ?? string.Empty)
-            : State.RemainingValues.Values.Count> 9
-            ? "+"
-            : State.RemainingValues.Values.Count.ToString();
+            : "+";
     }
     
     public override int GetHashCode()

@@ -1,10 +1,12 @@
-﻿namespace Solver.Domain.Cell;
+﻿using System.Collections;
 
-public struct RemainingCellValues
+namespace Solver.Domain.Cell;
+
+public struct RemainingCellValues : IEnumerable<CellValue>
 {
     public static readonly RemainingCellValues Empty = new(Array.Empty<CellValue>());
     public static readonly RemainingCellValues All = new(CellValue.AllValues);
-    public IReadOnlyCollection<CellValue> Values { get; } = CellValue.AllValues;
+    public IReadOnlyList<CellValue> Values { get; } = CellValue.AllValues;
 
     public RemainingCellValues(IEnumerable<CellValue> values): this(values as CellValue[] ?? values.ToArray())
     {
@@ -27,5 +29,20 @@ public struct RemainingCellValues
             throw new ArgumentException("invalid value", nameof(values));
         }
         Values = values;
+    }
+
+    public IEnumerator<CellValue> GetEnumerator()
+    {
+        return Values.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+    
+    public override string ToString()
+    {
+        return string.Join(",", Values);
     }
 }

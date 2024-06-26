@@ -6,7 +6,7 @@ namespace Solver.Domain.Board;
 /// <summary>
 /// indexed from top to bottom
 /// </summary>
-public readonly struct Column : IReadOnlyCollection<ICell>
+public readonly struct Column : IReadOnlyList<ICell>
 {
     public Column(IEnumerable<ICell>  cells): this(cells as ICell[]?? cells.ToArray())
     {
