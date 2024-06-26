@@ -38,10 +38,10 @@ public class GameBoard
         var row8 = new List<ICell>();
         
         const int rowSide = 9;
-        var ranges = new List<ICell[]>(rowSide);
+        var ranges = new List<List<ICell>>(rowSide);
         for (int rangneRowIndex = 0; rangneRowIndex < rowSide; rangneRowIndex++)
         {
-            ranges.Add(new ICell[rowSide]); 
+            ranges.Add(new List<ICell>(rowSide)); 
         }
 
         
@@ -73,23 +73,19 @@ public class GameBoard
             column.AddRange(cells.Skip(positionIndex*rowSide).Take(rowSide));
 
             var outerColumnIndex = positionIndex;
-            var rangeColumnIndex = outerColumnIndex % 3;
             for (int outerRowIndex = 0; outerRowIndex < rowSide; outerRowIndex++)
             {
                 var rangeIndex = ((outerRowIndex / 3)*3) + (outerColumnIndex/3);
 
-                var innerRangeIndex = (outerRowIndex % 3)*3 +(outerColumnIndex % 3);
-
                 var cellIndex = outerColumnIndex+outerRowIndex*rowSide;
-                ranges[rangeIndex][innerRangeIndex]=cells[cellIndex];
+                ranges[rangeIndex].Add(cells[cellIndex]);
             }
             
         }
 
-        Rows = new Row[]{new Row(row0), new Row(row1), new Row(row2), new Row(row3), new Row(row4), new Row(row5), new Row(row6), new Row(row7), new Row(row8)};
-        Columns = new Column[]{new Column(column0), new Column(column1), new Column(column2), new Column(column3), new Column(column4), new Column(column5), new Column(column6), new Column(column7), new Column(column8)};
+        Rows = new Row[]{new(row0), new(row1), new(row2), new(row3), new(row4), new(row5), new(row6), new(row7), new(row8)};
+        Columns = new Column[]{new(column0), new(column1), new(column2), new(column3), new(column4), new(column5), new(column6), new(column7), new(column8)};
         Regions = ranges.Select(l=>new ThreeByThree(l)).ToArray();
-        
     }
     /// <summary>
     /// indexed from top to bottom
