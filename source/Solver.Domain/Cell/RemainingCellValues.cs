@@ -2,7 +2,7 @@
 
 namespace Solver.Domain.Cell;
 
-public struct RemainingCellValues : IEnumerable<CellValue>
+public struct RemainingCellValues : IReadOnlyList<CellValue>
 {
     public static readonly RemainingCellValues Empty = new(Array.Empty<CellValue>());
     public static readonly RemainingCellValues All = new(CellValue.AllValues);
@@ -45,4 +45,8 @@ public struct RemainingCellValues : IEnumerable<CellValue>
     {
         return string.Join(",", Values);
     }
+
+    public int Count => Values.Count;
+
+    public CellValue this[int index] => Values[index];
 }

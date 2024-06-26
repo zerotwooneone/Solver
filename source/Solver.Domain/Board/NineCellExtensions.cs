@@ -48,4 +48,18 @@ public static class NineCellExtensions
 
         return cells.Where(c => c.Value != null);
     }
+    
+    public static (HashSet<CellValue> remaining, HashSet<CellValue> existing) GetStats(this IReadOnlyList<ICell> cells)
+    {
+        var existing = cells.Aggregate(new HashSet<CellValue>(), (hashSet, cell) =>
+        {
+            if (cell.Value.HasValue)
+            {
+                hashSet.Add(cell.Value.Value);
+            }
+            return hashSet;
+        });
+        var remaining = new HashSet<CellValue>( CellValue.AllValues.Where(c=>!existing.Contains(c)));
+        return (remaining, existing);
+    }
 }
