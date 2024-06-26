@@ -9,7 +9,7 @@ public abstract class UnsolvedCell
         public SolveState State => SolveState.Unsolved;
         public override string ToString()
         {
-            return "_";
+            return ICell.Blank;
         }
     }
 }
