@@ -37,7 +37,7 @@ public interface IRegion : IReadOnlyList<ICell>
         return GetEnumerator();
     }
     
-    ICell IReadOnlyList<ICell>.this[int i] => i switch
+    ICell IReadOnlyList<ICell>.this[int index] => index switch
     {
         0 => A,
         1 => B,
@@ -48,6 +48,30 @@ public interface IRegion : IReadOnlyList<ICell>
         6 => G,
         7 => H,
         8 => I,
-        _ => throw new ArgumentOutOfRangeException(nameof(i))
+        _ => throw new ArgumentOutOfRangeException(nameof(index))
     };
+
+    /// <summary>
+    /// Index starts at the upper left in row major order
+    /// </summary>
+    /// <param name="rowIndex"></param>
+    /// <param name="columnIndex"></param>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    ICell this[int rowIndex, int columnIndex]
+    {
+        get
+        {
+            if (rowIndex < 0  || rowIndex > 8)
+            {
+                throw new ArgumentOutOfRangeException(nameof(rowIndex));
+            }
+            if (columnIndex < 0 || columnIndex > 8)
+            {
+                throw new ArgumentOutOfRangeException(nameof(columnIndex));
+            }
+
+            var index = rowIndex * 3 + columnIndex;
+            return this[index];
+        }
+    }
 }

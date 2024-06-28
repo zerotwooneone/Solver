@@ -37,7 +37,7 @@ public struct NineCell : IRow, IColumn, IRegion
     public ICell H { get; } = UnsolvedCell.Instance;
     public ICell I { get; } = UnsolvedCell.Instance;
     
-    int IReadOnlyCollection<ICell>.Count => 9;
+    public int Count => 9;
     public override string ToString()
     {
         return $"{A} {B} {C}{Environment.NewLine}{D} {E} {F}{Environment.NewLine}{G} {H} {I}";
@@ -60,7 +60,7 @@ public struct NineCell : IRow, IColumn, IRegion
         return GetEnumerator();
     }
     
-    ICell IReadOnlyList<ICell>.this[int i] => i switch
+    public ICell this[int i] => i switch
     {
         0 => A,
         1 => B,
@@ -73,4 +73,22 @@ public struct NineCell : IRow, IColumn, IRegion
         8 => I,
         _ => throw new ArgumentOutOfRangeException(nameof(i))
     };
+    
+    ICell IRegion.this[int rowIndex, int columnIndex]
+    {
+        get
+        {
+            if (rowIndex < 0  || rowIndex > 8)
+            {
+                throw new ArgumentOutOfRangeException(nameof(rowIndex));
+            }
+            if (columnIndex < 0 || columnIndex > 8)
+            {
+                throw new ArgumentOutOfRangeException(nameof(columnIndex));
+            }
+
+            var index = rowIndex * 3 + columnIndex;
+            return this[index];
+        }
+    }
 }
