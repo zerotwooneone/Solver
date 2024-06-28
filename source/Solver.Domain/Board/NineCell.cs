@@ -3,16 +3,13 @@ using Solver.Domain.Cell;
 
 namespace Solver.Domain.Board;
 
-/// <summary>
-/// indexed from left to right
-/// </summary>
-public readonly struct Row : IReadOnlyList<ICell>
+public struct NineCell : IRow, IColumn, IRegion
 {
-    public Row(IEnumerable<ICell>  cells): this(cells as ICell[]?? cells.ToArray())
+    public NineCell(IEnumerable<ICell>  cells): this(cells as ICell[]?? cells.ToArray())
     {
     }
 
-    public Row(params ICell[] cells)
+    public NineCell(params ICell[] cells)
     {
         if (cells.Length != 9)
         {
@@ -40,19 +37,11 @@ public readonly struct Row : IReadOnlyList<ICell>
     public ICell H { get; } = UnsolvedCell.Instance;
     public ICell I { get; } = UnsolvedCell.Instance;
     
-    public ICell this[int i] => i switch
+    int IReadOnlyCollection<ICell>.Count => 9;
+    public override string ToString()
     {
-        0 => A,
-        1 => B,
-        2 => C,
-        3 => D,
-        4 => E,
-        5 => F,
-        6 => G,
-        7 => H,
-        8 => I,
-        _ => throw new ArgumentOutOfRangeException(nameof(i))
-    };
+        return $"{A} {B} {C}{Environment.NewLine}{D} {E} {F}{Environment.NewLine}{G} {H} {I}";
+    }
     
     public IEnumerator<ICell> GetEnumerator()
     {
@@ -66,16 +55,22 @@ public readonly struct Row : IReadOnlyList<ICell>
         yield return H;
         yield return I;
     }
-
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
     }
-
-    public int Count => 9;
     
-    public override string ToString()
+    ICell IReadOnlyList<ICell>.this[int i] => i switch
     {
-        return $"{A} {B} {C}{Environment.NewLine}{D} {E} {F}{Environment.NewLine}{G} {H} {I}";
-    }
+        0 => A,
+        1 => B,
+        2 => C,
+        3 => D,
+        4 => E,
+        5 => F,
+        6 => G,
+        7 => H,
+        8 => I,
+        _ => throw new ArgumentOutOfRangeException(nameof(i))
+    };
 }

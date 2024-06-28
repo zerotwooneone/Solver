@@ -93,29 +93,31 @@ public class GameBoard
 
         }
 
-        Rows = [new Row(row0), new(row1), new(row2), new(row3), new(row4), new(row5), new(row6), new(row7), new(row8)];
+        Rows = [new NineCell(row0), new NineCell(row1), new NineCell(row2), new NineCell(row3), new NineCell(row4), 
+            new NineCell(row5), new NineCell(row6), new NineCell(row7), new NineCell(row8)];
         Columns =
         [
-            new Column(column0), new(column1), new(column2), new(column3), new(column4), new(column5), new(column6),
-            new(column7), new(column8)
+            new NineCell(column0), new NineCell(column1), new NineCell(column2), new NineCell(column3), 
+            new NineCell(column4), new NineCell(column5), new NineCell(column6), new NineCell(column7), 
+            new NineCell(column8)
         ];
-        Regions = [..region.Select(l => new ThreeByThree(l)).ToArray()];
+        Regions = [..region.Select(l => new NineCell(l)).ToArray()];
     }
 
     /// <summary>
     /// indexed from top to bottom
     /// </summary>
-    public ImmutableArray<Row> Rows { get; }
+    public ImmutableArray<IRow> Rows { get; }
 
     /// <summary>
     /// indexed from left to right
     /// </summary>
-    public ImmutableArray<Column> Columns { get; }
+    public ImmutableArray<IColumn> Columns { get; }
 
     /// <summary>
     /// indexed from left to right and then top to bottom
     /// </summary>
-    public ImmutableArray<ThreeByThree> Regions { get; }
+    public ImmutableArray<IRegion> Regions { get; }
 
     public bool IsSolved => Rows.All(r => AllTrue(r.Check())) && Columns.All(c => AllTrue(c.Check())) &&
                             Regions.All(r => AllTrue(r.Check()));
