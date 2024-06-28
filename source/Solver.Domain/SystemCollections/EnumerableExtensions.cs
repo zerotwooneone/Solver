@@ -24,17 +24,15 @@ public static class EnumerableExtensions
             yield return itemsArray;
             yield break;
         }
-        var first = itemsArray.First();
-        var rest = new Queue<T>(itemsArray.Skip(1));
+        var rest = new Queue<T>(itemsArray);
 
         do
         {
+            var first = rest.Dequeue();
             foreach (var window in rest.Permutate(count-1))
             {
                 yield return window.Prepend(first).ToArray();
             }
-
-            first = rest.Dequeue();
         } while (rest.Count> count-2);
         
     }
