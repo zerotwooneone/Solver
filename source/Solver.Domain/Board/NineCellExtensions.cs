@@ -49,7 +49,7 @@ public static class NineCellExtensions
         return cells.Where(c => c.Value != null);
     }
     
-    public static (HashSet<CellValue> remaining, HashSet<CellValue> existing) GetStats(this IReadOnlyList<ICell> cells)
+    public static (HashSet<CellValue> remaining, HashSet<CellValue> solved) GetStats(this IReadOnlyList<ICell> cells)
     {
         var existing = cells.Aggregate(new HashSet<CellValue>(), (hashSet, cell) =>
         {
