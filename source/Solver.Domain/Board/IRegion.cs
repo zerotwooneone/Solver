@@ -61,11 +61,11 @@ public interface IRegion : IReadOnlyList<ICell>
     {
         get
         {
-            if (rowIndex < 0  || rowIndex > 8)
+            if (rowIndex < 0  || rowIndex > 2)
             {
                 throw new ArgumentOutOfRangeException(nameof(rowIndex));
             }
-            if (columnIndex < 0 || columnIndex > 8)
+            if (columnIndex < 0 || columnIndex > 2)
             {
                 throw new ArgumentOutOfRangeException(nameof(columnIndex));
             }
