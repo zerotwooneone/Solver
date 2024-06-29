@@ -42,9 +42,26 @@ public class RegionHelperTests
         Assert.AreEqual(0,actual.row);
     }
     [Test]
-    public void GetRegionIndex_Tr5c5Isr2c5()
+    public void GetRegionIndex_Tr5c5Isr2c2()
     {
         var actual = RegionHelper.GetIndexWithinRegion(5, 5);
+        
+        Assert.AreEqual(2,actual.column);
+        Assert.AreEqual(2,actual.row);
+    }
+    
+    [Test]
+    public void GetRegionCoordinates_Tr5c5Isr1c1()
+    {
+        var actual = RegionHelper.GetRegionCoordinates(5, 5);
+        
+        Assert.AreEqual(1,actual.column);
+        Assert.AreEqual(1,actual.row);
+    }
+    [Test]
+    public void GetRegionCoordinates_Tr6c6Isr2c2()
+    {
+        var actual = RegionHelper.GetRegionCoordinates(6, 6);
         
         Assert.AreEqual(2,actual.column);
         Assert.AreEqual(2,actual.row);

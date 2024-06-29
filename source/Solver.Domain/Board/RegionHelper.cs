@@ -11,4 +11,9 @@ public static class RegionHelper
     {
         return ( row:rowIndex % 3, column: columnIndex % 3);
     }
+    
+    public static (int row, int column) GetRegionCoordinates(int rowIndex, int columnIndex)
+    {
+        return (row: rowIndex / 3, column: columnIndex / 3);
+    }
 }
