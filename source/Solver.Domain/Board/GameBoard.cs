@@ -101,7 +101,7 @@ public class GameBoard
             new NineCell(column4), new NineCell(column5), new NineCell(column6), new NineCell(column7), 
             new NineCell(column8)
         ];
-        Regions = [..region.Select(l => new NineCell(l)).ToArray()];
+        Regions = new RegionCollection(region.Select(l => (IRegion)new NineCell(l)));
     }
 
     /// <summary>
@@ -117,7 +117,7 @@ public class GameBoard
     /// <summary>
     /// indexed from left to right and then top to bottom
     /// </summary>
-    public ImmutableArray<IRegion> Regions { get; }
+    public IRegionCollection Regions { get; }
 
     public bool IsSolved => Rows.All(r => AllTrue(r.Check())) && Columns.All(c => AllTrue(c.Check())) &&
                             Regions.All(r => AllTrue(r.Check()));
