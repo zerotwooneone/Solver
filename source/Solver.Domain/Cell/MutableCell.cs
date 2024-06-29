@@ -24,4 +24,10 @@ internal class MutableCell(int index, CellValue? value, IEnumerable<CellValue> r
 
         return Index - mutableOther.Index;
     }
+    public override string ToString()
+    {
+        return Value.HasValue 
+            ? (Value.ToString()?.ToLower() ?? string.Empty)
+            : "+";
+    }
 }

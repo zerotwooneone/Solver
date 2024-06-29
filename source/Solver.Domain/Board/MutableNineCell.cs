@@ -3,8 +3,13 @@ using Solver.Domain.Cell;
 
 namespace Solver.Domain.Board;
 
-internal struct MutableNineCell : IRow, IColumn, IRegion
+internal struct MutableNineCell : IRow, IColumn, IRegion, IReadOnlyList<MutableCell>
 {
+    public MutableNineCell()
+    {
+        Solved = new HashSet<CellValue>(9);
+        Remaining = new HashSet<CellValue>(CellValue.AllValues);
+    }
     public MutableNineCell(IEnumerable<MutableCell>  cells): this(cells as MutableCell[]?? cells.ToArray())
     {
     }
@@ -25,7 +30,15 @@ internal struct MutableNineCell : IRow, IColumn, IRegion
         G = cells[6];
         H = cells[7];
         I = cells[8];
+        
+        var (remaining, solved) = this.GetStats();
+        Remaining = remaining;
+        Solved = solved;
     }
+
+    public HashSet<CellValue> Solved { get; }
+
+    public HashSet<CellValue> Remaining { get; }
 
     public MutableCell A { get; set; }
     public MutableCell B { get; set; }
@@ -73,7 +86,19 @@ internal struct MutableNineCell : IRow, IColumn, IRegion
         return $"{A} {B} {C}{Environment.NewLine}{D} {E} {F}{Environment.NewLine}{G} {H} {I}";
     }
     
-    public IEnumerator<ICell> GetEnumerator()
+    public IEnumerator<MutableCell> GetEnumerator()
+    {
+        yield return A;
+        yield return B;
+        yield return C;
+        yield return D;
+        yield return E;
+        yield return F;
+        yield return G;
+        yield return H;
+        yield return I;
+    }
+    IEnumerator<ICell> IEnumerable<ICell>.GetEnumerator()
     {
         yield return A;
         yield return B;
@@ -155,32 +180,15 @@ internal struct MutableNineCell : IRow, IColumn, IRegion
         }
     }
     
-    ICell IRegion.this[int rowIndex, int columnIndex]
+    public MutableCell this[int rowIndex, int columnIndex]
     {
         get
         {
-            if (rowIndex < 0  || rowIndex > 8)
+            if (rowIndex < 0  || rowIndex > 2)
             {
                 throw new ArgumentOutOfRangeException(nameof(rowIndex));
             }
-            if (columnIndex < 0 || columnIndex > 8)
-            {
-                throw new ArgumentOutOfRangeException(nameof(columnIndex));
-            }
-
-            var index = rowIndex * 3 + columnIndex;
-            return this[index];
-        }
-    }
-    MutableCell this[int rowIndex, int columnIndex]
-    {
-        get
-        {
-            if (rowIndex < 0  || rowIndex > 8)
-            {
-                throw new ArgumentOutOfRangeException(nameof(rowIndex));
-            }
-            if (columnIndex < 0 || columnIndex > 8)
+            if (columnIndex < 0 || columnIndex > 2)
             {
                 throw new ArgumentOutOfRangeException(nameof(columnIndex));
             }
@@ -190,11 +198,11 @@ internal struct MutableNineCell : IRow, IColumn, IRegion
         }
         set
         {
-            if (rowIndex < 0  || rowIndex > 8)
+            if (rowIndex < 0  || rowIndex > 2)
             {
                 throw new ArgumentOutOfRangeException(nameof(rowIndex));
             }
-            if (columnIndex < 0 || columnIndex > 8)
+            if (columnIndex < 0 || columnIndex > 2)
             {
                 throw new ArgumentOutOfRangeException(nameof(columnIndex));
             }
@@ -202,5 +210,11 @@ internal struct MutableNineCell : IRow, IColumn, IRegion
             var index = rowIndex * 3 + columnIndex;
             this[index] = value;
         }
+    }
+
+    public void SetSolved(CellValue value)
+    {
+        Remaining.Remove(value);
+        Solved.Add(value);
     }
 }

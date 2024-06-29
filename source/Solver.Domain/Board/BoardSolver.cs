@@ -1,4 +1,5 @@
-﻿using Solver.Domain.Cell;
+﻿using System.Collections.Immutable;
+using Solver.Domain.Cell;
 
 namespace Solver.Domain.Board;
 
@@ -6,109 +7,132 @@ public class BoardSolver
 {
     public GameBoard GetSolvedBoard(GameBoard board)
     {
-        (GameBoard GameBoard, bool doRecheck) output = (board, false);
+        if (!board.IsValid)
+        {
+            throw new ArgumentException("the board is not valid");
+        }
+        if (board.IsSolved)
+        {
+            return board;
+        }
+
+        var (rows, columns, regions) = GetMutable(board);
+        var doRecheck = false;
         do
         {
-            output = GetSolvedBoard_Internal(output.GameBoard);
-        } while (output.doRecheck);
+            doRecheck = TryReduce(rows, columns, regions);
+        } while (doRecheck);
 
-        return output.GameBoard;
+        throw new NotImplementedException("return the game board here");
     }
 
-    private static (GameBoard gameBoard, bool doRecheck) GetSolvedBoard_Internal(GameBoard board)
+    private (IReadOnlyList<MutableNineCell> rows, IReadOnlyList<MutableNineCell> columns, IReadOnlyList<MutableNineCell> regions) GetMutable(GameBoard board)
+    {
+        var columns = Enumerable.Range(0,9).Select(_=> new MutableNineCell()).ToArray();
+        var regions = Enumerable.Range(0,9).Select(_=> new MutableNineCell()).ToArray();
+        var rows = board.Rows.Select((r,rowIndex)=>
+        {
+            var row = r.GetMutableNineCell();
+            for (int columnIndex = 0; columnIndex < 9; columnIndex++)
+            {
+                var cell = row[columnIndex];
+                CellValue? cellValue = cell.Value;
+                var column = columns[columnIndex];
+                column[rowIndex] = cell;
+                var regionIndex = RegionHelper.GetRegionIndex(rowIndex, columnIndex);
+
+                var indexWithinRegion = RegionHelper.GetIndexWithinRegion(rowIndex, columnIndex);
+                var region = regions[regionIndex];
+                region[indexWithinRegion.row, indexWithinRegion.column] = cell;
+
+                if (cellValue.HasValue)
+                {
+                    column.Remaining.Remove(cellValue.Value);
+                    column.Solved.Add(cellValue.Value);
+                    region.Remaining.Remove(cellValue.Value);
+                    region.Solved.Add(cellValue.Value);
+                }
+            }
+
+            return row;
+        }).ToImmutableArray();
+        return (rows, 
+            columns, 
+            regions);
+    }
+
+    private static bool TryReduce(
+        IReadOnlyList<MutableNineCell> rows, 
+        IReadOnlyList<MutableNineCell> columns, 
+        IReadOnlyList<MutableNineCell> regions)
     {
         var doRecheck = false;
 
         const int boardSize = 9;
-        var cells = new List<ICell>();
-        var regionStatsByIndex = new Dictionary<int, (HashSet<CellValue> remaining, HashSet<CellValue> solved)>();
         for (int rowIndex = 0; rowIndex < boardSize; rowIndex++)
         {
-            var row = board.Rows[rowIndex];
-            var rowStats = row.GetStats();
+            var row = rows[rowIndex];
             for (int columnIndex = 0; columnIndex < boardSize; columnIndex++)
             {
-                var column = board.Columns[columnIndex];
-                var columnStats = column.GetStats();
-
-                var cell = board[rowIndex, columnIndex];
-                if (cell.Value.HasValue || !cell.State.RemainingValues.Any())
+                var cell = rows[rowIndex][columnIndex];
+                var column = columns[columnIndex];
+                
+                var regionIndex = RegionHelper.GetRegionIndex(rowIndex, columnIndex);
+                var region = regions[regionIndex];
+                
+                void SetCellAsSolved(CellValue value, MutableCell cell)
                 {
-                    cells.Add(cell);
+                    row.SetSolved(value);
+                    column.SetSolved(value);
+                    region.SetSolved(value);
+                    
+                    cell.RemainingCellValues.Clear();
+                    cell.Value = value;
+                }
+                
+                if (cell.Value.HasValue && cell.RemainingCellValues.Any())
+                {
+                    SetCellAsSolved(cell.Value.Value, cell);
+                    return true;
+                }
+                if (cell.Value.HasValue)
+                {
+                    row.SetSolved(cell.Value.Value);
+                    column.SetSolved(cell.Value.Value);
+                    region.SetSolved(cell.Value.Value);
                     continue;
                 }
 
-                var regionIndex = ((rowIndex / 3) * 3) + (columnIndex / 3);
-                var region = board.Regions[regionIndex];
-                if (!regionStatsByIndex.ContainsKey(regionIndex))
+                if (cell.State.RemainingValues.Count ==1)
                 {
-                    regionStatsByIndex.Add(regionIndex, region.GetStats());
+                    var value = cell.State.RemainingValues[0];
+                    SetCellAsSolved(value, cell);
+                    return true;
                 }
-                var regionStats = regionStatsByIndex[regionIndex];
 
-                if (cell.State.RemainingValues.Count == 1)
+                var remaining = new RemainingCellValues(cell.RemainingCellValues.Where(r =>
+                    !row.Solved.Contains(r) &&
+                    !column.Solved.Contains(r) &&
+                    !region.Solved.Contains(r)));
+
+                if (remaining.Count == 0)
                 {
-                    var v = cell.State.RemainingValues.First();
-                    rowStats.solved.Add(v);
-                    rowStats.remaining.Remove(v);
-                    columnStats.solved.Add(v);
-                    columnStats.remaining.Remove(v);
-                    regionStats.solved.Add(v);
-                    regionStats.remaining.Remove(v);
+                    throw new NotImplementedException("no solution found");
+                }
 
-                    cells.Add(new SolvedCell(v));
+                if (remaining.Count == 1)
+                {
+                    SetCellAsSolved(remaining.First(), cell);
+                    return true;
+                }
+                if (remaining.SequenceEqual(cell.RemainingCellValues))
+                {
                     continue;
-                }
-
-                var remaining = new RemainingCellValues(cell.State.RemainingValues.Where(r =>
-                    !rowStats.solved.Contains(r) &&
-                    !columnStats.solved.Contains(r) &&
-                    !regionStats.solved.Contains(r)));
-
-                /*var indexWithinRow = columnIndex;
-                var indexWithinColumn = rowIndex;
-                var indexWithinRegion = (columnIndex % 3) + (rowIndex % 3) * 3;
-                var rowHs = row.TryGetHiddenSingle(indexWithinRow, out var value);
-                var columnHs = column.TryGetHiddenSingle(indexWithinColumn, out value);
-                var reguinHs = region.TryGetHiddenSingle(indexWithinRegion, out value);
-                if (rowHs ||
-                    columnHs ||
-                    reguinHs)
-                {
-                    var x = 0;
-                }*/
-
-                if (remaining.Count == cell.State.RemainingValues.Count)
-                {
-                    cells.Add(cell);
-                }
-                else if (remaining.Count == 0)
-                {
-                    cells.Add(UnsolvedCell.Instance);
-                }
-                else if (remaining.Count == 1)
-                {
-                    doRecheck = true;
-                    var foundSolution = remaining[0];
-
-                    rowStats.solved.Add(foundSolution);
-                    rowStats.remaining.Remove(foundSolution);
-                    columnStats.solved.Add(foundSolution);
-                    columnStats.remaining.Remove(foundSolution);
-                    regionStats.solved.Add(foundSolution);
-                    regionStats.remaining.Remove(foundSolution);
-
-                    cells.Add(new PartialCell(null, new RemainingCellValues(foundSolution)));
-                }
-                else
-                {
-                    doRecheck = true;
-                    cells.Add(new PartialCell(null, remaining));
                 }
             }
         }
 
-        return (gameBoard: new GameBoard(cells), doRecheck);
+        return doRecheck;
     }
 
     /// <summary>

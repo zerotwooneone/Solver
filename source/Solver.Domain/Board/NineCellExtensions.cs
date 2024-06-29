@@ -62,4 +62,23 @@ public static class NineCellExtensions
         var remaining = new HashSet<CellValue>( CellValue.AllValues.Where(c=>!existing.Contains(c)));
         return (remaining, existing);
     }
+
+    internal static MutableNineCell GetMutableNineCell(this IReadOnlyCollection<ICell> cells)
+    {
+        if(cells is MutableNineCell mutable)
+        {
+            return mutable;
+        }
+
+        if (cells.Count != 9)
+        {
+            throw new ArgumentException("NineCell must have exactly 9 cells", nameof(cells));
+        }
+        return new MutableNineCell(GetMutableCells(cells));
+    }
+    
+    internal static IReadOnlyCollection<MutableCell> GetMutableCells(this IReadOnlyCollection<ICell> cells)
+    {
+        return cells.Select((c,i)=>new MutableCell(i, c.Value, c.State.RemainingValues)).ToArray();
+    }
 }
