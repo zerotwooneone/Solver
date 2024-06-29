@@ -1,6 +1,6 @@
 ﻿namespace Solver.Domain.Cell;
 
-internal class MutableCell(int index, CellValue? value, IEnumerable<CellValue> remainingCellValues) : ICell
+public class MutableCell(int index, CellValue? value, IEnumerable<CellValue> remainingCellValues) : ICell
 {
     public int Index { get; } = index;
     public CellValue? Value { get; set; } = value;

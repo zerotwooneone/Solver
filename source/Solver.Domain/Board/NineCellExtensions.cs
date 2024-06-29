@@ -81,4 +81,75 @@ public static class NineCellExtensions
     {
         return cells.Select((c,i)=>new MutableCell(i, c.Value, c.State.RemainingValues)).ToArray();
     }
+
+    public static (MutableCell one, MutableCell two, CellValue value1, CellValue value2)? GetHiddenPair(
+        this IReadOnlyList<MutableCell> cells)
+    {
+        //var knownRemaining = new(int index, HashSet <CellValue> uniqueRemaining)[9];
+        for (int firstIndex = 0; firstIndex < cells.Count-1; firstIndex++)
+        {
+            var first = cells[firstIndex];
+            if (first.Value.HasValue || first.State.RemainingValues.Count ==1)
+            {
+                continue;
+            }
+            for (int secondIndex = firstIndex + 1; secondIndex < cells.Count; secondIndex++)
+            {
+                var second = cells[secondIndex];
+                if (second.Value.HasValue || second.State.RemainingValues.Count ==1)
+                {
+                    continue;
+                }
+                
+                var intersect = first.State.RemainingValues.Values.Intersect(second.State.RemainingValues.Values).ToArray();
+                if (intersect.Length < 2)
+                {
+                    continue;
+                }
+                
+                var others = cells.Where(c=>!c.Value.HasValue && c.Index!=firstIndex && c.Index!=secondIndex).ToArray();
+                if (!others.Any())
+                {
+                    continue;
+                }
+
+                var otherRemainingValues = others
+                    .Select(m=>m.State.RemainingValues.Values);
+                var otherIntersect = otherRemainingValues.Skip(1).Aggregate((IEnumerable<CellValue>)otherRemainingValues.First(), (a,b)=>
+                {
+                    return a.Intersect(b);
+                });
+                var otherHash = new HashSet<CellValue>(otherIntersect);
+
+                var distinctIntersect = intersect.Where(i => !otherHash.Contains(i)).ToArray();
+                if (distinctIntersect.Length != 2)
+                {
+                    continue;
+                }
+                return (first, second, distinctIntersect[0], distinctIntersect[1]);
+            }
+        }
+
+        /*var knownRemaining = new HashSet<CellValue>(CellValue.AllValues);
+        var remainingDistinctByCellValue = new Dictionary<CellValue, List<MutableCell>>();
+        foreach (var cell in cells)
+        {
+            if (cell.Value.HasValue)
+            {
+                knownRemaining.Remove(cell.Value.Value);
+                continue;
+            }
+
+            var didRemove = new List<CellValue>();
+            foreach (var value in cell.RemainingCellValues)
+            {
+                if (knownRemaining.Remove(value))
+                {
+                    didRemove.Add(value);
+                }
+            }
+        }*/
+        
+        return null;
+    }
 }
