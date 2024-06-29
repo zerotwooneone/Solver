@@ -23,11 +23,11 @@ public class NineCellExtensionTests
         Assert.IsTrue(cells.Check().IsValid);
         Assert.IsFalse(cells.Check().IsSolved);
 
-        var pair = cells.GetHiddenPair();
+        Assert.IsTrue(cells.TryGetHiddenPair(out var pair));
         Assert.NotNull(pair);
         
         var expected = new CellValue[]{2,6};
-        var actual = new CellValue[]{pair.Value.value1, pair.Value.value2};
+        var actual = new[]{pair.Value.value1, pair.Value.value2};
 
         CollectionAssert.AreEquivalent(expected, actual);
     }

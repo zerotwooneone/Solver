@@ -66,8 +66,6 @@ public class BoardSolver
         IReadOnlyList<MutableNineCell> columns, 
         MutableRegionCollection regions)
     {
-        var doRecheck = false;
-
         const int boardSize = 9;
         for (int rowIndex = 0; rowIndex < boardSize; rowIndex++)
         {
@@ -129,10 +127,21 @@ public class BoardSolver
                 {
                     continue;
                 }
+
+                if (column.TryGetHiddenPair(out var pair))
+                {
+                    pair.Value.one.RemainingCellValues.Clear();
+                    pair.Value.one.RemainingCellValues.Add(pair.Value.value1);
+                    pair.Value.one.RemainingCellValues.Add(pair.Value.value2);
+                    pair.Value.two.RemainingCellValues.Clear();
+                    pair.Value.two.RemainingCellValues.Add(pair.Value.value1);
+                    pair.Value.two.RemainingCellValues.Add(pair.Value.value2);
+                    return true;
+                }
             }
         }
 
-        return doRecheck;
+        return false;
     }
 
     /// <summary>

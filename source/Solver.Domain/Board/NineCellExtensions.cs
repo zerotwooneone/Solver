@@ -82,8 +82,9 @@ public static class NineCellExtensions
         return cells.Select((c,i)=>new MutableCell(i, c.Value, c.State.RemainingValues)).ToArray();
     }
 
-    public static (MutableCell one, MutableCell two, CellValue value1, CellValue value2)? GetHiddenPair(
-        this IReadOnlyList<MutableCell> cells)
+    public static bool TryGetHiddenPair(
+        this IReadOnlyList<MutableCell> cells,
+        out (MutableCell one, MutableCell two, CellValue value1, CellValue value2)? result)
     {
         //var knownRemaining = new(int index, HashSet <CellValue> uniqueRemaining)[9];
         for (int firstIndex = 0; firstIndex < cells.Count-1; firstIndex++)
@@ -126,7 +127,9 @@ public static class NineCellExtensions
                 {
                     continue;
                 }
-                return (first, second, distinctIntersect[0], distinctIntersect[1]);
+
+                result = (first, second, distinctIntersect[0], distinctIntersect[1]);
+                return true;
             }
         }
 
@@ -149,7 +152,7 @@ public static class NineCellExtensions
                 }
             }
         }*/
-        
-        return null;
+        result = null;
+        return false;
     }
 }
