@@ -3,7 +3,7 @@ using Solver.Domain.Cell;
 
 namespace Solver.Domain.Board;
 
-internal struct MutableNineCell : IRow, IColumn, IRegion, IReadOnlyList<MutableCell>
+internal class MutableNineCell : IRow, IColumn, IRegion, IReadOnlyList<MutableCell>
 {
     public MutableNineCell()
     {

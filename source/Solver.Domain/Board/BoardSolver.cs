@@ -26,10 +26,10 @@ public class BoardSolver
         throw new NotImplementedException("return the game board here");
     }
 
-    private (IReadOnlyList<MutableNineCell> rows, IReadOnlyList<MutableNineCell> columns, IReadOnlyList<MutableNineCell> regions) GetMutable(GameBoard board)
+    private (IReadOnlyList<MutableNineCell> rows, IReadOnlyList<MutableNineCell> columns, MutableRegionCollection regions) GetMutable(GameBoard board)
     {
         var columns = Enumerable.Range(0,9).Select(_=> new MutableNineCell()).ToArray();
-        var regions = Enumerable.Range(0,9).Select(_=> new MutableNineCell()).ToArray();
+        var regions = new MutableRegionCollection(Enumerable.Range(0,9).Select(_=> new MutableNineCell()));
         var rows = board.Rows.Select((r,rowIndex)=>
         {
             var row = r.GetMutableNineCell();
@@ -39,10 +39,10 @@ public class BoardSolver
                 CellValue? cellValue = cell.Value;
                 var column = columns[columnIndex];
                 column[rowIndex] = cell;
-                var regionIndex = RegionHelper.GetRegionIndex(rowIndex, columnIndex);
+                var regionCoordinates = RegionHelper.GetRegionCoordinates(rowIndex, columnIndex);
 
                 var indexWithinRegion = RegionHelper.GetIndexWithinRegion(rowIndex, columnIndex);
-                var region = regions[regionIndex];
+                var region = regions[regionCoordinates.row, regionCoordinates.column];
                 region[indexWithinRegion.row, indexWithinRegion.column] = cell;
 
                 if (cellValue.HasValue)
@@ -64,7 +64,7 @@ public class BoardSolver
     private static bool TryReduce(
         IReadOnlyList<MutableNineCell> rows, 
         IReadOnlyList<MutableNineCell> columns, 
-        IReadOnlyList<MutableNineCell> regions)
+        MutableRegionCollection regions)
     {
         var doRecheck = false;
 
@@ -77,8 +77,8 @@ public class BoardSolver
                 var cell = rows[rowIndex][columnIndex];
                 var column = columns[columnIndex];
                 
-                var regionIndex = RegionHelper.GetRegionIndex(rowIndex, columnIndex);
-                var region = regions[regionIndex];
+                var regionCoordinates = RegionHelper.GetRegionCoordinates(rowIndex, columnIndex);
+                var region = regions[regionCoordinates.row, regionCoordinates.column];
                 
                 void SetCellAsSolved(CellValue value, MutableCell cell)
                 {
