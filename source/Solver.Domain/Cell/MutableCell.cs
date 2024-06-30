@@ -5,11 +5,11 @@ public class MutableCell(int index, CellValue? value, IEnumerable<CellValue> rem
     public int Index { get; } = index;
     public CellValue? Value { get; set; } = value;
 
-    public SolveState State => RemainingCellValues.Count == 0
+    SolveState ICell.State => RemainingCellValues.Count == 0
         ? SolveState.Solved
         : SolveState.CreatePartialState(new RemainingCellValues(RemainingCellValues));
 
-    public List<CellValue> RemainingCellValues { get; set; } = remainingCellValues.ToList();
+    public HashSet<CellValue> RemainingCellValues { get;  } = [..remainingCellValues];
     public bool HasChanged { get; set; } = false;
         
     public int CompareTo(ICell? other)
