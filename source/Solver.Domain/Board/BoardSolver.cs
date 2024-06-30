@@ -38,17 +38,27 @@ public class BoardSolver
         var regions = new MutableRegionCollection(Enumerable.Range(0,9).Select(_=> new MutableNineCell()));
         var rows = board.Rows.Select((r,rowIndex)=>
         {
-            var row = r.GetMutableNineCell();
+            var row = new MutableNineCell();
             for (int columnIndex = 0; columnIndex < 9; columnIndex++)
             {
-                var cell = row[columnIndex];
-                CellValue? cellValue = cell.Value;
                 var column = columns[columnIndex];
-                column[rowIndex] = cell;
                 var regionCoordinates = RegionHelper.GetRegionCoordinates(rowIndex, columnIndex);
+                var region = regions[regionCoordinates.rowIndex, regionCoordinates.columnIndex];
+                
+                var cell = new MutableCell(
+                    r[columnIndex].Value, 
+                    r[columnIndex].State.RemainingValues,
+                    row,
+                    column,
+                    region);
+                row[columnIndex] = cell;
+                CellValue? cellValue = cell.Value;
+                
+                column[rowIndex] = cell;
+                
 
                 var indexWithinRegion = RegionHelper.GetIndexWithinRegion(rowIndex, columnIndex);
-                var region = regions[regionCoordinates.rowIndex, regionCoordinates.columnIndex];
+                
                 region[indexWithinRegion.rowIndex, indexWithinRegion.columnIndex] = cell;
 
                 if (cellValue.HasValue)
@@ -85,35 +95,22 @@ public class BoardSolver
                 var regionCoordinates = RegionHelper.GetRegionCoordinates(rowIndex, columnIndex);
                 var region = regions[regionCoordinates.rowIndex, regionCoordinates.columnIndex];
 
-                void SetCellAsSolved(CellValue value, MutableCell cell)
-                {
-                    row.SetSolved(value);
-                    column.SetSolved(value);
-                    region.SetSolved(value);
-
-                    cell.RemainingCellValues.Clear();
-                    cell.Value = value;
-                }
-
-                if (cell.Value.HasValue && cell.RemainingCellValues.Any())
-                {
-                    SetCellAsSolved(cell.Value.Value, cell);
-                    return true;
-                }
-
                 if (cell.Value.HasValue)
                 {
-                    row.SetSolved(cell.Value.Value);
-                    column.SetSolved(cell.Value.Value);
-                    region.SetSolved(cell.Value.Value);
+                    if (cell.SetCellAsSolved(cell.Value.Value))
+                    {
+                        return true;
+                    }
                     continue;
                 }
 
                 if (cell.RemainingCellValues.Count == 1)
                 {
                     var value = cell.RemainingCellValues.First();
-                    SetCellAsSolved(value, cell);
-                    return true;
+                    if (cell.SetCellAsSolved(value))
+                    {
+                        return true;
+                    }
                 }
 
                 var remaining = new HashSet<CellValue>( row.Remaining
@@ -125,12 +122,12 @@ public class BoardSolver
                     throw new NotImplementedException("no solution found");
                 }
 
-                if (remaining.Count == 1)
+                if (remaining.Count == 1 && cell.SetCellAsSolved(remaining.First()))
                 {
-                    SetCellAsSolved(remaining.First(), cell);
                     return true;
                 }
 
+                //todo: this should be cell.TryReduce(remaining)
                 if (remaining.Count < 9 && 
                     cell.RemainingCellValues.Aggregate(false,(hasChanged,currentCell)=>
                     {
@@ -143,81 +140,53 @@ public class BoardSolver
                 }
             }
 
-            void UpdateTriple((MutableCell one, MutableCell two, MutableCell three, CellValue value1, CellValue value2, CellValue value3) triple)
+            bool UpdateTriple((MutableCell one, MutableCell two, MutableCell three, CellValue value1, CellValue value2, CellValue value3) triple)
             {
-                triple.one.RemainingCellValues.Clear();
-                triple.one.RemainingCellValues.Add(triple.value1);
-                triple.one.RemainingCellValues.Add(triple.value2);
-                triple.one.RemainingCellValues.Add(triple.value3);
-                triple.two.RemainingCellValues.Clear();
-                triple.two.RemainingCellValues.Add(triple.value1);
-                triple.two.RemainingCellValues.Add(triple.value2);
-                triple.two.RemainingCellValues.Add(triple.value3);
-                triple.three.RemainingCellValues.Clear();
-                triple.three.RemainingCellValues.Add(triple.value1);
-                triple.three.RemainingCellValues.Add(triple.value2);
-                triple.three.RemainingCellValues.Add(triple.value3);
+                var changed = triple.one.TryReduceRemaining(triple.value1, triple.value2, triple.value3);
+                changed = triple.two.TryReduceRemaining(triple.value1, triple.value2, triple.value3) || changed;
+                changed = triple.three.TryReduceRemaining(triple.value1, triple.value2, triple.value3) || changed;
+                return changed;
             }
             if (row.TryGetHidden(out var rowPair))
             {
-                if (rowPair!.Value.single != null)
+                //todo: only return if SetCellAsSolved is true
+                if (rowPair!.Value.single != null && rowPair.Value.single.Value.one.SetCellAsSolved(rowPair.Value.single.Value.value1.Value))
                 {
-                    //row.SetSolved(value);
-                    row.SetSolved(rowPair.Value.single.Value.value1.Value);
-                    //region.SetSolved(value);
-
-                    rowPair.Value.single.Value.one.RemainingCellValues.Clear();
-                    rowPair.Value.single.Value.one.Value = rowPair.Value.single.Value.value1.Value;
+                    return true;
                 }
-                if (rowPair!.Value.pair != null) UpdatePair(rowPair.Value.pair.Value);
-                if (rowPair!.Value.triple != null) UpdateTriple(rowPair.Value.triple.Value);
-                return true;
+                if (rowPair!.Value.pair != null && UpdatePair(rowPair.Value.pair.Value)) return true;
+                if (rowPair!.Value.triple != null && UpdateTriple(rowPair.Value.triple.Value)) return true;
             }
 
             var tempColumn = columns[rowIndex];
             if (tempColumn.TryGetHidden(out var columnPair))
             {
-                if (columnPair!.Value.single != null)
+                if (columnPair!.Value.single != null && columnPair.Value.single.Value.one.SetCellAsSolved(columnPair.Value.single.Value.value1.Value))
                 {
-                    //row.SetSolved(value);
-                    tempColumn.SetSolved(columnPair.Value.single.Value.value1.Value);
-                    //region.SetSolved(value);
-
-                    columnPair.Value.single.Value.one.RemainingCellValues.Clear();
-                    columnPair.Value.single.Value.one.Value = columnPair.Value.single.Value.value1.Value;
+                    return true;
                 }
-                if (columnPair!.Value.pair != null) UpdatePair(columnPair.Value.pair.Value);
-                if (columnPair!.Value.triple != null) UpdateTriple(columnPair.Value.triple.Value);
-                return true;
+                if (columnPair!.Value.pair != null && UpdatePair(columnPair.Value.pair.Value)) return true;
+                if (columnPair!.Value.triple != null && UpdateTriple(columnPair.Value.triple.Value)) return true;
             }
 
             var tempRegionCoordinates = RegionHelper.GetRegionCoordinatesFromRowMajorOrder(rowIndex);
             var tempRegion = regions[tempRegionCoordinates.rowIndex, tempRegionCoordinates.columnIndex];
             if (tempRegion.TryGetHidden(out var regionPair))
             {
-                if (regionPair!.Value.single != null)
+                if (regionPair!.Value.single != null && regionPair.Value.single.Value.one.SetCellAsSolved(regionPair.Value.single.Value.value1.Value))
                 {
-                    //row.SetSolved(value);
-                    //row.SetSolved(regionPair.Value.single.Value.value1.Value);
-                    tempRegion.SetSolved(regionPair.Value.single.Value.value1.Value);
-
-                    regionPair.Value.single.Value.one.RemainingCellValues.Clear();
-                    regionPair.Value.single.Value.one.Value = regionPair.Value.single.Value.value1.Value;
+                    return true;
                 }
-                if (regionPair!.Value.pair != null) UpdatePair(regionPair.Value.pair.Value);
-                if (regionPair!.Value.triple != null) UpdateTriple(regionPair.Value.triple.Value);
+                if (regionPair!.Value.pair != null && UpdatePair(regionPair.Value.pair.Value)) return true;
+                if (regionPair!.Value.triple != null && UpdateTriple(regionPair.Value.triple.Value)) return true;
                 return true;
             }
 
-            void UpdatePair((MutableCell one, MutableCell two, CellValue value1, CellValue value2) pair)
+            bool UpdatePair((MutableCell one, MutableCell two, CellValue value1, CellValue value2) pair)
             {
-                pair.one.RemainingCellValues.Clear();
-                pair.one.RemainingCellValues.Add(pair.value1);
-                pair.one.RemainingCellValues.Add(pair.value2);
-                pair.two.RemainingCellValues.Clear();
-                pair.two.RemainingCellValues.Add(pair.value1);
-                pair.two.RemainingCellValues.Add(pair.value2);
-                
+                var changed = pair.one.TryReduceRemaining(pair.value1, pair.value2);
+                changed = pair.two.TryReduceRemaining(pair.value1, pair.value2) || changed;
+                return changed;
             }
         }
 

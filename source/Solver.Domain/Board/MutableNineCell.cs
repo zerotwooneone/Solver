@@ -3,7 +3,7 @@ using Solver.Domain.Cell;
 
 namespace Solver.Domain.Board;
 
-internal class MutableNineCell : IRow, IColumn, IRegion, IReadOnlyList<MutableCell>
+public class MutableNineCell : IRow, IColumn, IRegion, IReadOnlyList<MutableCell>
 {
     public MutableNineCell()
     {
@@ -212,9 +212,11 @@ internal class MutableNineCell : IRow, IColumn, IRegion, IReadOnlyList<MutableCe
         }
     }
 
-    public void SetSolved(CellValue value)
+    public bool SetSolved(CellValue value)
     {
-        Remaining.Remove(value);
-        Solved.Add(value);
+        var changed = Remaining.Remove(value);
+        changed = Solved.Add(value)|| changed;
+        //todo: consider looking for more solutions
+        return changed;
     }
 }

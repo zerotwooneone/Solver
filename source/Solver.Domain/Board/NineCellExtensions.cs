@@ -67,26 +67,6 @@ public static class NineCellExtensions
         return (remaining, existing);
     }
 
-    internal static MutableNineCell GetMutableNineCell(this IReadOnlyCollection<ICell> cells)
-    {
-        if (cells is MutableNineCell mutable)
-        {
-            return mutable;
-        }
-
-        if (cells.Count != 9)
-        {
-            throw new ArgumentException("NineCell must have exactly 9 cells", nameof(cells));
-        }
-
-        return new MutableNineCell(GetMutableCells(cells));
-    }
-
-    internal static IReadOnlyCollection<MutableCell> GetMutableCells(this IReadOnlyCollection<ICell> cells)
-    {
-        return cells.Select(c => new MutableCell(c.Value, c.State.RemainingValues)).ToArray();
-    }
-
     public static bool TryGetHidden(
         this IReadOnlyList<MutableCell> cells,
         out ((MutableCell one, CellValue value1)? single,
@@ -121,10 +101,14 @@ public static class NineCellExtensions
                         .ToArray();
                     if (distinctIntersect3.Length == 1)
                     {
-                        result = (single: (first, distinctIntersect3[0]),
-                            pair: null,
-                            triple: null);
-                        return true;
+                        //todo: try to remove this check
+                        if (cells.FirstOrDefault(c => c.Value == distinctIntersect3[0]) == null)
+                        {
+                            result = (single: (first, distinctIntersect3[0]),
+                                pair: null,
+                                triple: null);
+                            return true;
+                        }
                     }
                 }
             }

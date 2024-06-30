@@ -8,16 +8,19 @@ public class NineCellExtensionTests
     [Test]
     public void GetHidden_PairExists_AndFound()
     {
+        var row = new MutableNineCell();
+        var column = new MutableNineCell();
+        var region = new MutableNineCell();
         var cells = new []{
-            new MutableCell( null, new CellValue[]{3,4,7,8,9}),
-            new MutableCell( 1, Array.Empty<CellValue>()),
-            new MutableCell( null, new CellValue[]{3,4,7,8}),
-            new MutableCell( null, new CellValue[]{2,3,4,6,7,8}),
-            new MutableCell( null, new CellValue[]{3,4,7,8}),
-            new MutableCell( null, new CellValue[]{3,4,7,8}),
-            new MutableCell( null, new CellValue[]{2,3,4,6,8,9}),
-            new MutableCell( 5, Array.Empty<CellValue>()),
-            new MutableCell( null, new CellValue[]{3,4,8}),
+            new MutableCell( null, new CellValue[]{3,4,7,8,9}, row, column, region),
+            new MutableCell( 1, Array.Empty<CellValue>(), row, column, region),
+            new MutableCell( null, new CellValue[]{3,4,7,8}, row, column, region),
+            new MutableCell( null, new CellValue[]{2,3,4,6,7,8}, row, column, region),
+            new MutableCell( null, new CellValue[]{3,4,7,8}, row, column, region),
+            new MutableCell( null, new CellValue[]{3,4,7,8}, row, column, region),
+            new MutableCell( null, new CellValue[]{2,3,4,6,8,9}, row, column, region),
+            new MutableCell( 5, Array.Empty<CellValue>(), row, column, region),
+            new MutableCell( null, new CellValue[]{3,4,8}, row, column, region),
             };
         
         Assert.IsTrue(cells.Check().IsValid);
@@ -36,16 +39,19 @@ public class NineCellExtensionTests
     [Test]
     public void GetHidden_TripleExists_AndFound()
     {
+        var row = new MutableNineCell();
+        var column = new MutableNineCell();
+        var region = new MutableNineCell();
         var cells = new []{
-            new MutableCell( 1, Array.Empty<CellValue>()),
-            new MutableCell( 3, Array.Empty<CellValue>()),
-            new MutableCell( null, new CellValue[]{2}),
-            new MutableCell( null, new CellValue[]{2,4,5,6,7,8}),
-            new MutableCell( 9, Array.Empty<CellValue>()),
-            new MutableCell( null, new CellValue[]{2,4,8}),
-            new MutableCell( null, new CellValue[]{2,4,5,6,7,8}),
-            new MutableCell( null, new CellValue[]{2,4,5,6,7,8}),
-            new MutableCell( null, new CellValue[]{2,4,8}),
+            new MutableCell( 1, Array.Empty<CellValue>(), row, column, region),
+            new MutableCell( 3, Array.Empty<CellValue>(), row, column, region),
+            new MutableCell( null, new CellValue[]{2}, row, column, region),
+            new MutableCell( null, new CellValue[]{2,4,5,6,7,8}, row, column, region),
+            new MutableCell( 9, Array.Empty<CellValue>(), row, column, region),
+            new MutableCell( null, new CellValue[]{2,4,8}, row, column, region),
+            new MutableCell( null, new CellValue[]{2,4,5,6,7,8}, row, column, region),
+            new MutableCell( null, new CellValue[]{2,4,5,6,7,8}, row, column, region),
+            new MutableCell( null, new CellValue[]{2,4,8}, row, column, region),
         };
         
         Assert.IsTrue(cells.Check().IsValid);
@@ -64,16 +70,19 @@ public class NineCellExtensionTests
     [Test]
     public void GetHidden_SingleExists_AndFound()
     {
+        var row = new MutableNineCell();
+        var column = new MutableNineCell();
+        var region = new MutableNineCell();
         var cells = new []{
-            new MutableCell( null, new CellValue[]{7,8,9}),
-            new MutableCell( null, new CellValue[]{7,8,9}),
-            new MutableCell( null, new CellValue[]{1,7,8}),
-            new MutableCell( null, new CellValue[]{3,4,7,8}),
-            new MutableCell( 2, Array.Empty<CellValue>()),
-            new MutableCell( 6, Array.Empty<CellValue>()),
-            new MutableCell( null, new CellValue[]{3,4,9}),
-            new MutableCell( null, new CellValue[]{3,4,9}),
-            new MutableCell( 5, Array.Empty<CellValue>()),
+            new MutableCell( null, new CellValue[]{7,8,9}, row, column, region),
+            new MutableCell( null, new CellValue[]{7,8,9}, row, column, region),
+            new MutableCell( null, new CellValue[]{1,7,8}, row, column, region),
+            new MutableCell( null, new CellValue[]{3,4,7,8}, row, column, region),
+            new MutableCell( 2, Array.Empty<CellValue>(), row, column, region),
+            new MutableCell( 6, Array.Empty<CellValue>(), row, column, region),
+            new MutableCell( null, new CellValue[]{3,4,9}, row, column, region),
+            new MutableCell( null, new CellValue[]{3,4,9}, row, column, region),
+            new MutableCell( 5, Array.Empty<CellValue>(), row, column, region),
         };
         
         Assert.IsTrue(cells.Check().IsValid);
