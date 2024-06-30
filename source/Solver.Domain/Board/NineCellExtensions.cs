@@ -87,9 +87,10 @@ public static class NineCellExtensions
         return cells.Select(c => new MutableCell(c.Value, c.State.RemainingValues)).ToArray();
     }
 
-    public static bool TryGetHiddenPair(
+    public static bool TryGetHidden(
         this IReadOnlyList<MutableCell> cells,
-        out (MutableCell one, MutableCell two, CellValue value1, CellValue value2)? result)
+        out ((MutableCell one, MutableCell two, CellValue value1, CellValue value2)? pair,
+            (MutableCell one, MutableCell two, MutableCell three, CellValue value1, CellValue value2, CellValue value3)? triple)? result)
     {
         for (var firstIndex = 0; firstIndex < cells.Count - 1; firstIndex++)
         {
@@ -105,6 +106,52 @@ public static class NineCellExtensions
                 if (second.Value.HasValue || second.RemainingCellValues.Count == 1 || second.RemainingCellValues.Count == CellValue.AllValues.Count)
                 {
                     continue;
+                }
+
+                for (var thirdIndex = secondIndex + 1; thirdIndex < cells.Count; thirdIndex++)
+                {
+                    var third = cells[thirdIndex];
+                    if (third.Value.HasValue || third.RemainingCellValues.Count == 1 || third.RemainingCellValues.Count == CellValue.AllValues.Count)
+                    {
+                        continue;
+                    }
+
+                    var intersect3 = first.RemainingCellValues
+                        .Intersect(second.RemainingCellValues)
+                        .Intersect(third.RemainingCellValues)
+                        .ToArray();
+                    if (intersect3.Length < 4)
+                    {
+                        continue;
+                    }
+
+                    var others3 = cells
+                        .Where(c => !c.Value.HasValue && !first.Equals(c) && !second.Equals(c) && !third.Equals(c))
+                        .ToArray();
+                    if (others3.Length == 0)
+                    {
+                        continue;
+                    }
+
+                    var otherRemainingValues3 = others3
+                        .Select(m => m.RemainingCellValues)
+                        .ToArray();
+                    var otherUnion3 = otherRemainingValues3
+                        .Skip(1)
+                        .Aggregate((IEnumerable<CellValue>) otherRemainingValues3.First(), (a, b) => a.Union(b));
+                    var otherHash3 = new HashSet<CellValue>(otherUnion3);
+
+                    var distinctIntersect3 = intersect3
+                        .Where(i => !otherHash3.Contains(i))
+                        .ToArray();
+                    if (distinctIntersect3.Length != 3)
+                    {
+                        continue;
+                    }
+
+                    result = (pair: null,
+                            triple: (first, second, third, distinctIntersect3[0], distinctIntersect3[1], distinctIntersect3[2]));
+                    return true;
                 }
 
                 var intersect = first.RemainingCellValues
@@ -139,7 +186,8 @@ public static class NineCellExtensions
                     continue;
                 }
 
-                result = (first, second, distinctIntersect[0], distinctIntersect[1]);
+                result = (pair: (first, second, distinctIntersect[0], distinctIntersect[1]), 
+                    triple: null);
                 return true;
             }
         }

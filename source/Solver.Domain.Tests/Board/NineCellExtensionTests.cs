@@ -23,9 +23,10 @@ public class NineCellExtensionTests
         Assert.IsTrue(cells.Check().IsValid);
         Assert.IsFalse(cells.Check().IsSolved);
 
-        Assert.IsTrue(cells.TryGetHiddenPair(out var pair));
-        Assert.NotNull(pair);
+        Assert.IsTrue(cells.TryGetHidden(out var tuple));
+        Assert.NotNull(tuple);
         
+        var pair = tuple.Value.pair;
         var expected = new CellValue[]{2,6};
         var actual = new[]{pair.Value.value1, pair.Value.value2};
 

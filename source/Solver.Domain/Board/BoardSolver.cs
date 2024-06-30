@@ -16,11 +16,17 @@ public class BoardSolver
             return board;
         }
 
+        const int sanityMaximum = 10000;
+        int sanityCount = 0;
         var (rows, columns, regions) = GetMutable(board);
         var doRecheck = false;
         do
         {
             doRecheck = TryReduce(rows, columns, regions);
+            if (sanityCount++ > sanityMaximum)
+            {
+                throw new Exception("sanity check exceeded");
+            }
         } while (doRecheck);
 
         throw new NotImplementedException("return the game board here");
@@ -136,41 +142,55 @@ public class BoardSolver
                     return true;
                 }
             }
-            
-            if (row.TryGetHiddenPair(out var rowPair))
+
+            void UpdateTriple((MutableCell one, MutableCell two, MutableCell three, CellValue value1, CellValue value2, CellValue value3) triple)
             {
-                rowPair.Value.one.RemainingCellValues.Clear();
-                rowPair.Value.one.RemainingCellValues.Add(rowPair.Value.value1);
-                rowPair.Value.one.RemainingCellValues.Add(rowPair.Value.value2);
-                rowPair.Value.two.RemainingCellValues.Clear();
-                rowPair.Value.two.RemainingCellValues.Add(rowPair.Value.value1);
-                rowPair.Value.two.RemainingCellValues.Add(rowPair.Value.value2);
+                triple.one.RemainingCellValues.Clear();
+                triple.one.RemainingCellValues.Add(triple.value1);
+                triple.one.RemainingCellValues.Add(triple.value2);
+                triple.one.RemainingCellValues.Add(triple.value3);
+                triple.two.RemainingCellValues.Clear();
+                triple.two.RemainingCellValues.Add(triple.value1);
+                triple.two.RemainingCellValues.Add(triple.value2);
+                triple.two.RemainingCellValues.Add(triple.value3);
+                triple.three.RemainingCellValues.Clear();
+                triple.three.RemainingCellValues.Add(triple.value1);
+                triple.three.RemainingCellValues.Add(triple.value2);
+                triple.three.RemainingCellValues.Add(triple.value3);
+            }
+            if (row.TryGetHidden(out var rowPair))
+            {
+                if (rowPair!.Value.pair != null) UpdatePair(rowPair.Value.pair.Value);
+                if (rowPair!.Value.triple != null) UpdateTriple(rowPair.Value.triple.Value);
                 return true;
             }
 
             var tempColumn = columns[rowIndex];
-            if (tempColumn.TryGetHiddenPair(out var columnPair))
+            if (tempColumn.TryGetHidden(out var columnPair))
             {
-                columnPair.Value.one.RemainingCellValues.Clear();
-                columnPair.Value.one.RemainingCellValues.Add(columnPair.Value.value1);
-                columnPair.Value.one.RemainingCellValues.Add(columnPair.Value.value2);
-                columnPair.Value.two.RemainingCellValues.Clear();
-                columnPair.Value.two.RemainingCellValues.Add(columnPair.Value.value1);
-                columnPair.Value.two.RemainingCellValues.Add(columnPair.Value.value2);
+                if (columnPair!.Value.pair != null) UpdatePair(columnPair.Value.pair.Value);
+                if (columnPair!.Value.triple != null) UpdateTriple(columnPair.Value.triple.Value);
                 return true;
             }
 
             var tempRegionCoordinates = RegionHelper.GetRegionCoordinatesFromRowMajorOrder(rowIndex);
             var tempRegion = regions[tempRegionCoordinates.rowIndex, tempRegionCoordinates.columnIndex];
-            if (tempRegion.TryGetHiddenPair(out var regionPair))
+            if (tempRegion.TryGetHidden(out var regionPair))
             {
-                regionPair.Value.one.RemainingCellValues.Clear();
-                regionPair.Value.one.RemainingCellValues.Add(regionPair.Value.value1);
-                regionPair.Value.one.RemainingCellValues.Add(regionPair.Value.value2);
-                regionPair.Value.two.RemainingCellValues.Clear();
-                regionPair.Value.two.RemainingCellValues.Add(regionPair.Value.value1);
-                regionPair.Value.two.RemainingCellValues.Add(regionPair.Value.value2);
+                if (regionPair!.Value.pair != null) UpdatePair(regionPair.Value.pair.Value);
+                if (regionPair!.Value.triple != null) UpdateTriple(regionPair.Value.triple.Value);
                 return true;
+            }
+
+            void UpdatePair((MutableCell one, MutableCell two, CellValue value1, CellValue value2) pair)
+            {
+                pair.one.RemainingCellValues.Clear();
+                pair.one.RemainingCellValues.Add(pair.value1);
+                pair.one.RemainingCellValues.Add(pair.value2);
+                pair.two.RemainingCellValues.Clear();
+                pair.two.RemainingCellValues.Add(pair.value1);
+                pair.two.RemainingCellValues.Add(pair.value2);
+                
             }
         }
 
