@@ -84,7 +84,7 @@ public static class NineCellExtensions
 
     internal static IReadOnlyCollection<MutableCell> GetMutableCells(this IReadOnlyCollection<ICell> cells)
     {
-        return cells.Select((c, i) => new MutableCell(i, c.Value, c.State.RemainingValues)).ToArray();
+        return cells.Select(c => new MutableCell(c.Value, c.State.RemainingValues)).ToArray();
     }
 
     public static bool TryGetHiddenPair(
