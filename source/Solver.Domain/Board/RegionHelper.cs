@@ -12,8 +12,13 @@ public static class RegionHelper
         return ( row:rowIndex % 3, column: columnIndex % 3);
     }
     
-    public static (int row, int column) GetRegionCoordinates(int rowIndex, int columnIndex)
+    public static (int rowIndex, int columnIndex) GetRegionCoordinates(int rowIndex, int columnIndex)
     {
-        return (row: rowIndex / 3, column: columnIndex / 3);
+        return (rowIndex: rowIndex / 3, columnIndex: columnIndex / 3);
+    }
+
+    public static (int rowIndex, int columnIndex) GetRegionCoordinatesFromRowMajorOrder(int index)
+    {
+        return (rowIndex: index / 3, columnIndex: index % 3);
     }
 }
