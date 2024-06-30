@@ -160,6 +160,15 @@ public class BoardSolver
             }
             if (row.TryGetHidden(out var rowPair))
             {
+                if (rowPair!.Value.single != null)
+                {
+                    //row.SetSolved(value);
+                    row.SetSolved(rowPair.Value.single.Value.value1.Value);
+                    //region.SetSolved(value);
+
+                    rowPair.Value.single.Value.one.RemainingCellValues.Clear();
+                    rowPair.Value.single.Value.one.Value = rowPair.Value.single.Value.value1.Value;
+                }
                 if (rowPair!.Value.pair != null) UpdatePair(rowPair.Value.pair.Value);
                 if (rowPair!.Value.triple != null) UpdateTriple(rowPair.Value.triple.Value);
                 return true;
@@ -168,6 +177,15 @@ public class BoardSolver
             var tempColumn = columns[rowIndex];
             if (tempColumn.TryGetHidden(out var columnPair))
             {
+                if (columnPair!.Value.single != null)
+                {
+                    //row.SetSolved(value);
+                    tempColumn.SetSolved(columnPair.Value.single.Value.value1.Value);
+                    //region.SetSolved(value);
+
+                    columnPair.Value.single.Value.one.RemainingCellValues.Clear();
+                    columnPair.Value.single.Value.one.Value = columnPair.Value.single.Value.value1.Value;
+                }
                 if (columnPair!.Value.pair != null) UpdatePair(columnPair.Value.pair.Value);
                 if (columnPair!.Value.triple != null) UpdateTriple(columnPair.Value.triple.Value);
                 return true;
@@ -177,6 +195,15 @@ public class BoardSolver
             var tempRegion = regions[tempRegionCoordinates.rowIndex, tempRegionCoordinates.columnIndex];
             if (tempRegion.TryGetHidden(out var regionPair))
             {
+                if (regionPair!.Value.single != null)
+                {
+                    //row.SetSolved(value);
+                    //row.SetSolved(regionPair.Value.single.Value.value1.Value);
+                    tempRegion.SetSolved(regionPair.Value.single.Value.value1.Value);
+
+                    regionPair.Value.single.Value.one.RemainingCellValues.Clear();
+                    regionPair.Value.single.Value.one.Value = regionPair.Value.single.Value.value1.Value;
+                }
                 if (regionPair!.Value.pair != null) UpdatePair(regionPair.Value.pair.Value);
                 if (regionPair!.Value.triple != null) UpdateTriple(regionPair.Value.triple.Value);
                 return true;
