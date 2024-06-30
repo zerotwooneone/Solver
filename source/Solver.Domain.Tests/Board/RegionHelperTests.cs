@@ -38,16 +38,16 @@ public class RegionHelperTests
     {
         var actual = RegionHelper.GetIndexWithinRegion(0, 0);
         
-        Assert.AreEqual(0,actual.column);
-        Assert.AreEqual(0,actual.row);
+        Assert.AreEqual(0,actual.columnIndex);
+        Assert.AreEqual(0,actual.rowIndex);
     }
     [Test]
     public void GetRegionIndex_Tr5c5Isr2c2()
     {
         var actual = RegionHelper.GetIndexWithinRegion(5, 5);
         
-        Assert.AreEqual(2,actual.column);
-        Assert.AreEqual(2,actual.row);
+        Assert.AreEqual(2,actual.columnIndex);
+        Assert.AreEqual(2,actual.rowIndex);
     }
     
     [Test]
