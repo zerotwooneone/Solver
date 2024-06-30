@@ -89,7 +89,8 @@ public static class NineCellExtensions
 
     public static bool TryGetHidden(
         this IReadOnlyList<MutableCell> cells,
-        out ((MutableCell one, MutableCell two, CellValue value1, CellValue value2)? pair,
+        out ((MutableCell one, CellValue value1)? single,
+            (MutableCell one, MutableCell two, CellValue value1, CellValue value2)? pair,
             (MutableCell one, MutableCell two, MutableCell three, CellValue value1, CellValue value2, CellValue value3)? triple)? result)
     {
         for (var firstIndex = 0; firstIndex < cells.Count - 1; firstIndex++)
@@ -100,6 +101,34 @@ public static class NineCellExtensions
                 continue;
             }
 
+            if (first.RemainingCellValues.Count >= 2)
+            {
+                var others3 = cells
+                    .Where(c => !c.Value.HasValue && !first.Equals(c))
+                    .ToArray();
+                if (others3.Length > 0)
+                {
+                    var otherRemainingValues3 = others3
+                        .Select(m => m.RemainingCellValues)
+                        .ToArray();
+                    var otherUnion3 = otherRemainingValues3
+                        .Skip(1)
+                        .Aggregate((IEnumerable<CellValue>) otherRemainingValues3.First(), (a, b) => a.Union(b));
+                    var otherHash3 = new HashSet<CellValue>(otherUnion3);
+
+                    var distinctIntersect3 = first.RemainingCellValues
+                        .Where(i => !otherHash3.Contains(i))
+                        .ToArray();
+                    if (distinctIntersect3.Length == 1)
+                    {
+                        result = (single: (first, distinctIntersect3[0]),
+                            pair: null,
+                            triple: null);
+                        return true;
+                    }
+                }
+            }
+            
             for (var secondIndex = firstIndex + 1; secondIndex < cells.Count; secondIndex++)
             {
                 var second = cells[secondIndex];
@@ -149,7 +178,8 @@ public static class NineCellExtensions
                         continue;
                     }
 
-                    result = (pair: null,
+                    result = (single: null,
+                        pair: null,
                             triple: (first, second, third, distinctIntersect3[0], distinctIntersect3[1], distinctIntersect3[2]));
                     return true;
                 }
@@ -186,7 +216,8 @@ public static class NineCellExtensions
                     continue;
                 }
 
-                result = (pair: (first, second, distinctIntersect[0], distinctIntersect[1]), 
+                result = (single: null,
+                    pair: (first, second, distinctIntersect[0], distinctIntersect[1]), 
                     triple: null);
                 return true;
             }

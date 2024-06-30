@@ -60,4 +60,30 @@ public class NineCellExtensionTests
 
         CollectionAssert.AreEquivalent(expected, actual);
     }
+    
+    [Test]
+    public void GetHidden_SingleExists_AndFound()
+    {
+        var cells = new []{
+            new MutableCell( null, new CellValue[]{7,8,9}),
+            new MutableCell( null, new CellValue[]{7,8,9}),
+            new MutableCell( null, new CellValue[]{1,7,8}),
+            new MutableCell( null, new CellValue[]{3,4,7,8}),
+            new MutableCell( 2, Array.Empty<CellValue>()),
+            new MutableCell( 6, Array.Empty<CellValue>()),
+            new MutableCell( null, new CellValue[]{3,4,9}),
+            new MutableCell( null, new CellValue[]{3,4,9}),
+            new MutableCell( 5, Array.Empty<CellValue>()),
+        };
+        
+        Assert.IsTrue(cells.Check().IsValid);
+        Assert.IsFalse(cells.Check().IsSolved);
+
+        Assert.IsTrue(cells.TryGetHidden(out var tuple));
+        Assert.NotNull(tuple);
+        
+        var single = tuple.Value.single;
+
+        Assert.AreEqual(1, single.Value.value1.Value);
+    }
 }
