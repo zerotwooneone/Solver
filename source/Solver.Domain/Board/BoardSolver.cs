@@ -42,8 +42,8 @@ public class BoardSolver
                 var regionCoordinates = RegionHelper.GetRegionCoordinates(rowIndex, columnIndex);
 
                 var indexWithinRegion = RegionHelper.GetIndexWithinRegion(rowIndex, columnIndex);
-                var region = regions[regionCoordinates.row, regionCoordinates.column];
-                region[indexWithinRegion.row, indexWithinRegion.column] = cell;
+                var region = regions[regionCoordinates.rowIndex, regionCoordinates.columnIndex];
+                region[indexWithinRegion.rowIndex, indexWithinRegion.columnIndex] = cell;
 
                 if (cellValue.HasValue)
                 {
@@ -70,29 +70,31 @@ public class BoardSolver
         for (int rowIndex = 0; rowIndex < boardSize; rowIndex++)
         {
             var row = rows[rowIndex];
+            
             for (int columnIndex = 0; columnIndex < boardSize; columnIndex++)
             {
                 var cell = rows[rowIndex][columnIndex];
                 var column = columns[columnIndex];
-                
+
                 var regionCoordinates = RegionHelper.GetRegionCoordinates(rowIndex, columnIndex);
-                var region = regions[regionCoordinates.row, regionCoordinates.column];
-                
+                var region = regions[regionCoordinates.rowIndex, regionCoordinates.columnIndex];
+
                 void SetCellAsSolved(CellValue value, MutableCell cell)
                 {
                     row.SetSolved(value);
                     column.SetSolved(value);
                     region.SetSolved(value);
-                    
+
                     cell.RemainingCellValues.Clear();
                     cell.Value = value;
                 }
-                
+
                 if (cell.Value.HasValue && cell.RemainingCellValues.Any())
                 {
                     SetCellAsSolved(cell.Value.Value, cell);
                     return true;
                 }
+
                 if (cell.Value.HasValue)
                 {
                     row.SetSolved(cell.Value.Value);
@@ -101,17 +103,16 @@ public class BoardSolver
                     continue;
                 }
 
-                if (cell.State.RemainingValues.Count ==1)
+                if (cell.RemainingCellValues.Count == 1)
                 {
-                    var value = cell.State.RemainingValues[0];
+                    var value = cell.RemainingCellValues.First();
                     SetCellAsSolved(value, cell);
                     return true;
                 }
 
-                var remaining = new RemainingCellValues(cell.RemainingCellValues.Where(r =>
-                    !row.Solved.Contains(r) &&
-                    !column.Solved.Contains(r) &&
-                    !region.Solved.Contains(r)));
+                var remaining = new HashSet<CellValue>( row.Remaining
+                    .Intersect(column.Remaining)
+                    .Intersect(region.Remaining));
 
                 if (remaining.Count == 0)
                 {
@@ -123,21 +124,53 @@ public class BoardSolver
                     SetCellAsSolved(remaining.First(), cell);
                     return true;
                 }
-                if (remaining.SequenceEqual(cell.RemainingCellValues))
-                {
-                    continue;
-                }
 
-                if (column.TryGetHiddenPair(out var pair))
+                if (remaining.Count < 9 && 
+                    cell.RemainingCellValues.Aggregate(false,(hasChanged,currentCell)=>
+                    {
+                        var didChange = (!remaining.Contains(currentCell) &&
+                                      cell.RemainingCellValues.Remove(currentCell));
+                        return hasChanged || didChange;
+                    }))
                 {
-                    pair.Value.one.RemainingCellValues.Clear();
-                    pair.Value.one.RemainingCellValues.Add(pair.Value.value1);
-                    pair.Value.one.RemainingCellValues.Add(pair.Value.value2);
-                    pair.Value.two.RemainingCellValues.Clear();
-                    pair.Value.two.RemainingCellValues.Add(pair.Value.value1);
-                    pair.Value.two.RemainingCellValues.Add(pair.Value.value2);
                     return true;
                 }
+            }
+            
+            if (row.TryGetHiddenPair(out var rowPair))
+            {
+                rowPair.Value.one.RemainingCellValues.Clear();
+                rowPair.Value.one.RemainingCellValues.Add(rowPair.Value.value1);
+                rowPair.Value.one.RemainingCellValues.Add(rowPair.Value.value2);
+                rowPair.Value.two.RemainingCellValues.Clear();
+                rowPair.Value.two.RemainingCellValues.Add(rowPair.Value.value1);
+                rowPair.Value.two.RemainingCellValues.Add(rowPair.Value.value2);
+                return true;
+            }
+
+            var tempColumn = columns[rowIndex];
+            if (tempColumn.TryGetHiddenPair(out var columnPair))
+            {
+                columnPair.Value.one.RemainingCellValues.Clear();
+                columnPair.Value.one.RemainingCellValues.Add(columnPair.Value.value1);
+                columnPair.Value.one.RemainingCellValues.Add(columnPair.Value.value2);
+                columnPair.Value.two.RemainingCellValues.Clear();
+                columnPair.Value.two.RemainingCellValues.Add(columnPair.Value.value1);
+                columnPair.Value.two.RemainingCellValues.Add(columnPair.Value.value2);
+                return true;
+            }
+
+            var tempRegionCoordinates = RegionHelper.GetRegionCoordinatesFromRowMajorOrder(rowIndex);
+            var tempRegion = regions[tempRegionCoordinates.rowIndex, tempRegionCoordinates.columnIndex];
+            if (tempRegion.TryGetHiddenPair(out var regionPair))
+            {
+                regionPair.Value.one.RemainingCellValues.Clear();
+                regionPair.Value.one.RemainingCellValues.Add(regionPair.Value.value1);
+                regionPair.Value.one.RemainingCellValues.Add(regionPair.Value.value2);
+                regionPair.Value.two.RemainingCellValues.Clear();
+                regionPair.Value.two.RemainingCellValues.Add(regionPair.Value.value1);
+                regionPair.Value.two.RemainingCellValues.Add(regionPair.Value.value2);
+                return true;
             }
         }
 

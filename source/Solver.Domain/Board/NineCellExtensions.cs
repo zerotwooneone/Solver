@@ -94,7 +94,7 @@ public static class NineCellExtensions
         for (var firstIndex = 0; firstIndex < cells.Count - 1; firstIndex++)
         {
             var first = cells[firstIndex];
-            if (first.Value.HasValue || first.State.RemainingValues.Count == 1)
+            if (first.Value.HasValue || first.RemainingCellValues.Count == 1 || first.RemainingCellValues.Count == CellValue.AllValues.Count)
             {
                 continue;
             }
@@ -102,21 +102,21 @@ public static class NineCellExtensions
             for (var secondIndex = firstIndex + 1; secondIndex < cells.Count; secondIndex++)
             {
                 var second = cells[secondIndex];
-                if (second.Value.HasValue || second.State.RemainingValues.Count == 1)
+                if (second.Value.HasValue || second.RemainingCellValues.Count == 1 || second.RemainingCellValues.Count == CellValue.AllValues.Count)
                 {
                     continue;
                 }
 
-                var intersect = first.State.RemainingValues.Values
-                    .Intersect(second.State.RemainingValues.Values)
+                var intersect = first.RemainingCellValues
+                    .Intersect(second.RemainingCellValues)
                     .ToArray();
-                if (intersect.Length < 2)
+                if (intersect.Length < 3)
                 {
                     continue;
                 }
 
                 var others = cells
-                    .Where(c => !c.Value.HasValue && c.Index != firstIndex && c.Index != secondIndex)
+                    .Where(c => !c.Value.HasValue && !first.Equals(c) && !second.Equals(c))
                     .ToArray();
                 if (others.Length == 0)
                 {
@@ -124,12 +124,12 @@ public static class NineCellExtensions
                 }
 
                 var otherRemainingValues = others
-                    .Select(m => m.State.RemainingValues.Values)
+                    .Select(m => m.RemainingCellValues)
                     .ToArray();
-                var otherIntersect = otherRemainingValues
+                var otherUnion = otherRemainingValues
                     .Skip(1)
-                    .Aggregate((IEnumerable<CellValue>) otherRemainingValues.First(), (a, b) => a.Intersect(b));
-                var otherHash = new HashSet<CellValue>(otherIntersect);
+                    .Aggregate((IEnumerable<CellValue>) otherRemainingValues.First(), (a, b) => a.Union(b));
+                var otherHash = new HashSet<CellValue>(otherUnion);
 
                 var distinctIntersect = intersect
                     .Where(i => !otherHash.Contains(i))
