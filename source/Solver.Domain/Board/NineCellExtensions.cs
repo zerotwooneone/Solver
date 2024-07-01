@@ -170,7 +170,6 @@ public static class NineCellExtensions
 
                 var intersect = first.RemainingCellValues
                     .Intersect(second.RemainingCellValues)
-                    //dds .Where(v=>!first.Row.Solved.Contains(v) && !first.Column.Solved.Contains(v) && !first.Region.Solved.Contains(v) && !second.Row.Solved.Contains(v) && !second.Column.Solved.Contains(v) && !second.Region.Solved.Contains(v))
                     .ToArray();
                 if (intersect.Length < 3)
                 {

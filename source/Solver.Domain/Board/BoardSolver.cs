@@ -91,13 +91,10 @@ public class BoardSolver
             
             for (int columnIndex = 0; columnIndex < boardSize; columnIndex++)
             {
-                Debug.WriteLine($"Starting cell r{rowIndex},c{columnIndex}");
                 var cell = rows[rowIndex][columnIndex];
                 hasChanged = cell.TryReduce() || hasChanged;
             }
 
-            Debug.WriteLine($"Starting to look for hidden");
-            Debug.WriteLine("");
             bool UpdateTriple((MutableCell one, MutableCell two, MutableCell three, CellValue value1, CellValue value2, CellValue value3) triple)
             {
                 var changed = triple.one.TryReduceRemaining(triple.value1, triple.value2, triple.value3);
@@ -166,9 +163,6 @@ public class BoardSolver
                 changed = pair.two.TryReduceRemaining(pair.value1, pair.value2) || changed;
                 return changed;
             }
-            
-            Debug.WriteLine("end of hidden check");
-            Debug.WriteLine("");
         }
 
         return hasChanged;

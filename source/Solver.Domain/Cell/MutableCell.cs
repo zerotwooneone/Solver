@@ -35,13 +35,8 @@ public class MutableCell(CellValue? value, IEnumerable<CellValue> remainingCellV
         var changed = RemainingCellValues.Count > 0;
         RemainingCellValues.Clear();
         changed = Value != value || changed;
-        if (changed)
-        {
-            Debug.WriteLine($"Cell changed from {Value} to {value}");
-        }
         Value = value;
         
-        //debug: changed && value == 9
         changed = Row.SetSolved(value) || changed;
         changed = Column.SetSolved(value) || changed;
         changed = Region.SetSolved(value) || changed;
