@@ -21,4 +21,22 @@ public class BoardSolverTests
         CollectionAssert.AreEqual(expected.Columns, solution.Columns);
         CollectionAssert.AreEqual(expected.Regions, solution.Regions);
     }
+    
+    [Test]
+    public void File2IsSolved()
+    {
+        var builder = new BoardBuilder();
+        var b = builder.CreateFrom9x9Csv(@"Unsolved\input2.txt");;
+        var solver = new BoardSolver();
+        var solution = solver.GetSolvedBoard(b);
+        
+        Assert.IsTrue(solution.GetIsValid());
+        Assert.IsTrue(solution.GetIsSolved());
+        
+        var expected = builder.CreateFrom9x9Csv(@"Valid\input2.solution.txt");
+        
+        CollectionAssert.AreEqual(expected.Rows, solution.Rows);
+        CollectionAssert.AreEqual(expected.Columns, solution.Columns);
+        CollectionAssert.AreEqual(expected.Regions, solution.Regions);
+    }
 }
