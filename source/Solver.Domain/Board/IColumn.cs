@@ -15,10 +15,7 @@ public interface IColumn : IReadOnlyList<ICell>
     ICell H { get; }
     ICell I { get; }
     
-    string ToString()
-    {
-        return $"{A} {B} {C}{Environment.NewLine}{D} {E} {F}{Environment.NewLine}{G} {H} {I}";
-    }
+    string MonoSpacedString => $"{A} {B} {C}{Environment.NewLine}{D} {E} {F}{Environment.NewLine}{G} {H} {I}";
     
     int IReadOnlyCollection<ICell>.Count => 9;
     IEnumerator<ICell> IEnumerable<ICell>.GetEnumerator()

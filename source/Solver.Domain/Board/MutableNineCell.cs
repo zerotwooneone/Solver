@@ -86,7 +86,7 @@ public class MutableNineCell : IRow, IColumn, IRegion, IReadOnlyList<MutableCell
     public int Count => 9;
     public override string ToString()
     {
-        return $"{A} {B} {C}{Environment.NewLine}{D} {E} {F}{Environment.NewLine}{G} {H} {I}";
+        return $"{A},{B},{C} {D},{E},{F} {G},{H},{I}";
     }
     
     public IEnumerator<MutableCell> GetEnumerator()
