@@ -5,11 +5,6 @@ namespace Solver.Domain.Board;
 
 public class GameBoard
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="cells">cells must be in row major order</param>
-    /// <exception cref="ArgumentException"></exception>
     public GameBoard(IEnumerable<IRow> rows, IEnumerable<IColumn> columns, IEnumerable<IRegion> regions)
     {
         if (rows == null)
