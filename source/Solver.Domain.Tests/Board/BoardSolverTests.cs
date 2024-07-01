@@ -14,5 +14,11 @@ public class BoardSolverTests
         
         Assert.IsTrue(solution.GetIsValid());
         Assert.IsTrue(solution.GetIsSolved());
+        
+        var expected = builder.CreateFrom9x9Csv(@"Valid\Solution.txt");
+        
+        CollectionAssert.AreEqual(expected.Rows, solution.Rows);
+        CollectionAssert.AreEqual(expected.Columns, solution.Columns);
+        CollectionAssert.AreEqual(expected.Regions, solution.Regions);
     }
 }
