@@ -7,11 +7,11 @@ public class BoardSolver
 {
     public GameBoard GetSolvedBoard(GameBoard board)
     {
-        if (!board.IsValid)
+        if (!board.GetIsValid())
         {
             throw new ArgumentException("the board is not valid");
         }
-        if (board.IsSolved)
+        if (board.GetIsSolved())
         {
             return board;
         }
@@ -29,7 +29,7 @@ public class BoardSolver
             }
         } while (doRecheck);
 
-        throw new NotImplementedException("return the game board here");
+        return new GameBoard(rows, columns, regions);
     }
 
     private (IReadOnlyList<MutableNineCell> rows, IReadOnlyList<MutableNineCell> columns, MutableRegionCollection regions) GetMutable(GameBoard board)

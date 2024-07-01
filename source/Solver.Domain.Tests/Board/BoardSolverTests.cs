@@ -12,7 +12,7 @@ public class BoardSolverTests
         var solver = new BoardSolver();
         var solution = solver.GetSolvedBoard(b);
         
-        Assert.IsTrue(solution.IsValid);
-        Assert.IsTrue(solution.IsSolved);
+        Assert.IsTrue(solution.GetIsValid());
+        Assert.IsTrue(solution.GetIsSolved());
     }
 }

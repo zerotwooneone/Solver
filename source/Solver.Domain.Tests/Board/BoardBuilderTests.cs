@@ -12,7 +12,7 @@ public class BoardBuilderTests
         
         var b = builder.CreateFrom9x9Csv(@"Valid\Solution.txt");;
         
-        Assert.IsTrue(b.IsValid);
-        Assert.IsTrue(b.IsSolved);
+        Assert.IsTrue(b.GetIsValid());
+        Assert.IsTrue(b.GetIsSolved());
     }
 }

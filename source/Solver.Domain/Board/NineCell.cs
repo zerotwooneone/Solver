@@ -3,7 +3,7 @@ using Solver.Domain.Cell;
 
 namespace Solver.Domain.Board;
 
-public struct NineCell : IRow, IColumn, IRegion
+public class NineCell : IRow, IColumn, IRegion
 {
     public NineCell(IEnumerable<ICell>  cells): this(cells as ICell[]?? cells.ToArray())
     {
