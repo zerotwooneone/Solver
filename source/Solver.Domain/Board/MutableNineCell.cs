@@ -5,12 +5,15 @@ namespace Solver.Domain.Board;
 
 public class MutableNineCell : IRow, IColumn, IRegion, IReadOnlyList<MutableCell>
 {
-    public MutableNineCell()
+    public int Index { get; }
+
+    public MutableNineCell(int index)
     {
+        Index = index;
         Solved = new HashSet<CellValue>(9);
         Remaining = new HashSet<CellValue>(CellValue.AllValues);
     }
-    public MutableNineCell(IEnumerable<MutableCell>  cells): this(cells as MutableCell[]?? cells.ToArray())
+    /*public MutableNineCell(IEnumerable<MutableCell>  cells): this(cells as MutableCell[]?? cells.ToArray())
     {
     }
 
@@ -34,7 +37,7 @@ public class MutableNineCell : IRow, IColumn, IRegion, IReadOnlyList<MutableCell
         var (remaining, solved) = this.GetStats();
         Remaining = remaining;
         Solved = solved;
-    }
+    }*/
 
     public HashSet<CellValue> Solved { get; }
 

@@ -1,4 +1,5 @@
-﻿using Solver.Domain.Board;
+﻿using System.Diagnostics;
+using Solver.Domain.Board;
 
 namespace Solver.Domain.Cell;
 
@@ -8,6 +9,9 @@ public class MutableCell(CellValue? value, IEnumerable<CellValue> remainingCellV
     public MutableNineCell Row { get; } = row;
     public MutableNineCell Column { get; } = column;
     public MutableNineCell Region { get; } = region;
+    public int RowIndex => Row.Index;
+    public int ColumnIndex => Column.Index;
+    public int RegionIndex => Region.Index;
 
     SolveState ICell.State => RemainingCellValues.Count == 0
         ? SolveState.Solved
@@ -24,9 +28,17 @@ public class MutableCell(CellValue? value, IEnumerable<CellValue> remainingCellV
     
     public bool SetCellAsSolved(CellValue value)
     {
+        if (Value.HasValue && Value != value)
+        {
+            throw new InvalidOperationException("Cell has already been solved");
+        }
         var changed = RemainingCellValues.Count > 0;
         RemainingCellValues.Clear();
         changed = Value != value || changed;
+        if (changed)
+        {
+            Debug.WriteLine($"Cell changed from {Value} to {value}");
+        }
         Value = value;
         
         //debug: changed && value == 9
@@ -37,23 +49,57 @@ public class MutableCell(CellValue? value, IEnumerable<CellValue> remainingCellV
         return changed;
     }
 
-    public bool TryReduceRemaining(params CellValue[] values)
+    public bool TryReduceRemaining(params CellValue[] remaining)
     {
-        if (values.Length == CellValue.AllValues.Count)
+        if (remaining.Length == CellValue.AllValues.Count)
         {
             return false;
         }
 
-        bool changed = !RemainingCellValues.SetEquals(values);
-        if (changed)
+        return RemainingCellValues.Aggregate(false,(hc,currentCell)=> (!remaining.Contains(currentCell) &&
+                                                                       RemainingCellValues.Remove(currentCell)) || hc);
+    }
+    
+    public bool TryReduce()
+    {
+        bool hasChanged=false;
+        
+        if (Value.HasValue)
         {
-            RemainingCellValues.Clear();
-            foreach (var cellValue in values)
+            if (SetCellAsSolved(Value.Value))
             {
-                RemainingCellValues.Add(cellValue);
+                hasChanged = true;
             }
         }
 
-        return changed;
+        if (RemainingCellValues.Count == 1)
+        {
+            var value = RemainingCellValues.First();
+            if (SetCellAsSolved(value))
+            {
+                hasChanged = true;
+            }
+        }
+
+        var remaining = Row.Remaining
+            .Intersect(Column.Remaining)
+            .Intersect(Region.Remaining)
+            .ToArray();
+
+        if (!Value.HasValue && 
+            remaining.Length == 1 && 
+            SetCellAsSolved(remaining.First()))
+        {
+            hasChanged = true;
+        }
+
+        if (TryReduceRemaining(remaining) && RemainingCellValues.Count == 1)
+        {
+            var value = RemainingCellValues.First();
+            SetCellAsSolved(value);
+            hasChanged = true;
+        }
+
+        return hasChanged;
     }
 }

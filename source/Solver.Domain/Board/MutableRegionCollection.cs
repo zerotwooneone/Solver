@@ -1,6 +1,6 @@
 ﻿namespace Solver.Domain.Board;
 
-internal class MutableRegionCollection : IRegionCollection
+public class MutableRegionCollection : IRegionCollection
 {
     public MutableNineCell NW { get; }
     public MutableNineCell N { get; }

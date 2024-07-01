@@ -8,9 +8,9 @@ public class NineCellExtensionTests
     [Test]
     public void GetHidden_PairExists_AndFound()
     {
-        var row = new MutableNineCell();
-        var column = new MutableNineCell();
-        var region = new MutableNineCell();
+        var row = new MutableNineCell(0);
+        var column = new MutableNineCell(0);
+        var region = new MutableNineCell(0);
         var cells = new []{
             new MutableCell( null, new CellValue[]{3,4,7,8,9}, row, column, region),
             new MutableCell( 1, Array.Empty<CellValue>(), row, column, region),
@@ -39,9 +39,9 @@ public class NineCellExtensionTests
     [Test]
     public void GetHidden_TripleExists_AndFound()
     {
-        var row = new MutableNineCell();
-        var column = new MutableNineCell();
-        var region = new MutableNineCell();
+        var row = new MutableNineCell(0);
+        var column = new MutableNineCell(0);
+        var region = new MutableNineCell(0);
         var cells = new []{
             new MutableCell( 1, Array.Empty<CellValue>(), row, column, region),
             new MutableCell( 3, Array.Empty<CellValue>(), row, column, region),
@@ -70,9 +70,9 @@ public class NineCellExtensionTests
     [Test]
     public void GetHidden_SingleExists_AndFound()
     {
-        var row = new MutableNineCell();
-        var column = new MutableNineCell();
-        var region = new MutableNineCell();
+        var row = new MutableNineCell(0);
+        var column = new MutableNineCell(0);
+        var region = new MutableNineCell(0);
         var cells = new []{
             new MutableCell( null, new CellValue[]{7,8,9}, row, column, region),
             new MutableCell( null, new CellValue[]{7,8,9}, row, column, region),
