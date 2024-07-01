@@ -3,6 +3,15 @@
 public interface ICell 
 {
     public CellValue? Value { get; }
-    public const string Blank = "_";
-    public SolveState State { get; }
+    
+    public IReadOnlySet<CellValue> RemainingCellValues { get; }
+    
+    public const string MonoSpacedBlank = "_";
+    public const string MonoSpacedUnsolved = "+";
+
+    public string MonoSpacedString=>Value.HasValue
+            ? (Value.ToString() ?? string.Empty)
+            : RemainingCellValues.Any()
+            ? MonoSpacedUnsolved
+            : MonoSpacedBlank;
 }

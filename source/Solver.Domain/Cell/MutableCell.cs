@@ -13,17 +13,13 @@ public class MutableCell(CellValue? value, IEnumerable<CellValue> remainingCellV
     public int ColumnIndex => Column.Index;
     public int RegionIndex => Region.Index;
 
-    SolveState ICell.State => RemainingCellValues.Count == 0
-        ? SolveState.Solved
-        : SolveState.CreatePartialState(new RemainingCellValues(RemainingCellValues));
-
     public HashSet<CellValue> RemainingCellValues { get;  } = [..remainingCellValues];
+    IReadOnlySet<CellValue> ICell.RemainingCellValues => RemainingCellValues;
+    
     public bool HasChanged { get; set; } = false;
     public override string ToString()
     {
-        return Value.HasValue 
-            ? (Value.ToString()?.ToLower() ?? string.Empty)
-            : "+";
+        return ((ICell)this).MonoSpacedString;
     }
     
     public bool SetCellAsSolved(CellValue value)

@@ -48,7 +48,7 @@ public class BoardSolver
                 
                 var cell = new MutableCell(
                     r[columnIndex].Value, 
-                    r[columnIndex].State.RemainingValues,
+                    r[columnIndex].RemainingCellValues,
                     row,
                     column,
                     region);

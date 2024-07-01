@@ -1,15 +1,13 @@
 ﻿namespace Solver.Domain.Cell;
 
-public class PartialCell(CellValue? value, RemainingCellValues remainingValues) : ICell
+public class PartialCell(CellValue? value, IEnumerable<CellValue> remainingValues) : ICell
 {
     public CellValue? Value { get; } = value;
-    public SolveState State { get; } = SolveState.CreatePartialState(remainingValues);
+    public IReadOnlySet<CellValue> RemainingCellValues { get; } = new HashSet<CellValue>(remainingValues);
 
     public override string ToString()
     {
-        return Value.HasValue 
-            ? (Value.ToString()?.ToLower() ?? string.Empty)
-            : "+";
+        return ((ICell)this).MonoSpacedString;
     }
     
     public override int GetHashCode()

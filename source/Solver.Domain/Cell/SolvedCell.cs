@@ -3,11 +3,12 @@
 public class SolvedCell(CellValue value) : ICell
 {
     public CellValue? Value { get; } = value;
-    public SolveState State => SolveState.Solved;
+    private static readonly HashSet<CellValue> Empty = new();
+    public IReadOnlySet<CellValue> RemainingCellValues => Empty;
 
     public override string ToString()
     {
-        return Value.ToString() ?? "?";
+        return value.ToString();
     }
 
     public override int GetHashCode()

@@ -6,10 +6,11 @@ public abstract class UnsolvedCell
     private class UnsolvedCell_Internal : ICell
     {
         public CellValue? Value => null;
-        public SolveState State => SolveState.Unsolved;
+        private static readonly HashSet<CellValue> All = new(CellValue.AllValues);
+        public IReadOnlySet<CellValue> RemainingCellValues => All;
         public override string ToString()
         {
-            return ICell.Blank;
+            return ICell.MonoSpacedBlank;
         }
     }
 }
