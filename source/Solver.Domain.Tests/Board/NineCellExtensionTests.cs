@@ -11,14 +11,16 @@ public class NineCellExtensionTests
         var row = new MutableNineCell(0);
         var column = new MutableNineCell(0);
         var region = new MutableNineCell(0);
+        var expectedCell1 = new MutableCell( null, new CellValue[]{2,3,4,6,7,8}, row, column, region);
+        var expectedCell2 = new MutableCell( null, new CellValue[]{2,3,4,6,8,9}, row, column, region);
         var cells = new []{
             new MutableCell( null, new CellValue[]{3,4,7,8,9}, row, column, region),
             new MutableCell( 1, Array.Empty<CellValue>(), row, column, region),
             new MutableCell( null, new CellValue[]{3,4,7,8}, row, column, region),
-            new MutableCell( null, new CellValue[]{2,3,4,6,7,8}, row, column, region),
+            expectedCell1,
             new MutableCell( null, new CellValue[]{3,4,7,8}, row, column, region),
             new MutableCell( null, new CellValue[]{3,4,7,8}, row, column, region),
-            new MutableCell( null, new CellValue[]{2,3,4,6,8,9}, row, column, region),
+            expectedCell2,
             new MutableCell( 5, Array.Empty<CellValue>(), row, column, region),
             new MutableCell( null, new CellValue[]{3,4,8}, row, column, region),
             };
@@ -28,12 +30,14 @@ public class NineCellExtensionTests
 
         Assert.IsTrue(cells.TryGetHidden(out var tuple));
         Assert.NotNull(tuple);
+        Assert.AreEqual(2, tuple.Value.Cells.Count);
+        Assert.AreEqual(2, tuple.Value.ToRemoveFromEach.Count);
         
-        var pair = tuple.Value.pair;
         var expected = new CellValue[]{2,6};
-        var actual = new[]{pair.Value.value1, pair.Value.value2};
+        var expectedCells = new[] {expectedCell1, expectedCell2};
 
-        CollectionAssert.AreEquivalent(expected, actual);
+        CollectionAssert.AreEquivalent(expected, tuple.Value.ToRemoveFromEach);
+        CollectionAssert.AreEquivalent(expectedCells, tuple.Value.Cells);
     }
     
     [Test]
@@ -42,15 +46,18 @@ public class NineCellExtensionTests
         var row = new MutableNineCell(0);
         var column = new MutableNineCell(0);
         var region = new MutableNineCell(0);
+        var expectedCell1 = new MutableCell( null, new CellValue[]{2,4,5,6,7,8}, row, column, region);
+        var expectedCell2 = new MutableCell( null, new CellValue[]{2,4,5,6,7,8}, row, column, region);
+        var expectedCell3 = new MutableCell( null, new CellValue[]{2,4,5,6,7,8}, row, column, region);
         var cells = new []{
             new MutableCell( 1, Array.Empty<CellValue>(), row, column, region),
             new MutableCell( 3, Array.Empty<CellValue>(), row, column, region),
             new MutableCell( null, new CellValue[]{2}, row, column, region),
-            new MutableCell( null, new CellValue[]{2,4,5,6,7,8}, row, column, region),
+            expectedCell1,
             new MutableCell( 9, Array.Empty<CellValue>(), row, column, region),
             new MutableCell( null, new CellValue[]{2,4,8}, row, column, region),
-            new MutableCell( null, new CellValue[]{2,4,5,6,7,8}, row, column, region),
-            new MutableCell( null, new CellValue[]{2,4,5,6,7,8}, row, column, region),
+            expectedCell2,
+            expectedCell3,
             new MutableCell( null, new CellValue[]{2,4,8}, row, column, region),
         };
         
@@ -59,12 +66,14 @@ public class NineCellExtensionTests
 
         Assert.IsTrue(cells.TryGetHidden(out var tuple));
         Assert.NotNull(tuple);
+        Assert.AreEqual(3, tuple.Value.Cells.Count);
+        Assert.AreEqual(3, tuple.Value.ToRemoveFromEach.Count);
         
-        var triple = tuple.Value.triple;
         var expected = new CellValue[]{5,6,7};
-        var actual = new[]{triple.Value.value1, triple.Value.value2, triple.Value.value3};
+        var expectedCells = new[] {expectedCell1, expectedCell2, expectedCell3};
 
-        CollectionAssert.AreEquivalent(expected, actual);
+        CollectionAssert.AreEquivalent(expected, tuple.Value.ToRemoveFromEach);
+        CollectionAssert.AreEquivalent(expectedCells, tuple.Value.Cells);
     }
     
     [Test]
@@ -73,10 +82,11 @@ public class NineCellExtensionTests
         var row = new MutableNineCell(0);
         var column = new MutableNineCell(0);
         var region = new MutableNineCell(0);
+        var expectedCell1 = new MutableCell( null, new CellValue[]{1,7,8}, row, column, region);
         var cells = new []{
             new MutableCell( null, new CellValue[]{7,8,9}, row, column, region),
             new MutableCell( null, new CellValue[]{7,8,9}, row, column, region),
-            new MutableCell( null, new CellValue[]{1,7,8}, row, column, region),
+            expectedCell1,
             new MutableCell( null, new CellValue[]{3,4,7,8}, row, column, region),
             new MutableCell( 2, Array.Empty<CellValue>(), row, column, region),
             new MutableCell( 6, Array.Empty<CellValue>(), row, column, region),
@@ -91,8 +101,13 @@ public class NineCellExtensionTests
         Assert.IsTrue(cells.TryGetHidden(out var tuple));
         Assert.NotNull(tuple);
         
-        var single = tuple.Value.single;
+        Assert.AreEqual(1, tuple.Value.Cells.Count);
+        Assert.AreEqual(1, tuple.Value.ToRemoveFromEach.Count);
+        
+        var expected = new CellValue[]{1};
+        var expectedCells = new[] {expectedCell1};
 
-        Assert.AreEqual(1, single.Value.value1.Value);
+        CollectionAssert.AreEquivalent(expected, tuple.Value.ToRemoveFromEach);
+        CollectionAssert.AreEquivalent(expectedCells, tuple.Value.Cells);
     }
 }

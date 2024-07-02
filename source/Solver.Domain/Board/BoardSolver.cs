@@ -85,83 +85,52 @@ public class BoardSolver
     {
         bool hasChanged = false;
         const int boardSize = 9;
-        for (int rowIndex = 0; rowIndex < boardSize; rowIndex++)
+        for (var rowIndex = 0; rowIndex < boardSize; rowIndex++)
         {
             var row = rows[rowIndex];
             
-            for (int columnIndex = 0; columnIndex < boardSize; columnIndex++)
+            for (var columnIndex = 0; columnIndex < boardSize; columnIndex++)
             {
                 var cell = rows[rowIndex][columnIndex];
                 hasChanged = cell.TryReduce() || hasChanged;
             }
 
-            bool UpdateTriple((MutableCell one, MutableCell two, MutableCell three, CellValue value1, CellValue value2, CellValue value3) triple)
+            bool HandleHiddenRemaining(NineCellExtensions.HiddenRemaining hiddenRemaining)
             {
-                var changed = triple.one.TryReduceRemaining(triple.value1, triple.value2, triple.value3);
-                changed = triple.two.TryReduceRemaining(triple.value1, triple.value2, triple.value3) || changed;
-                changed = triple.three.TryReduceRemaining(triple.value1, triple.value2, triple.value3) || changed;
-                return changed;
+                switch (hiddenRemaining.Cells.Count)
+                {
+                    case 1:
+                        return hiddenRemaining.Cells.First().SetCellAsSolved(hiddenRemaining.ToRemoveFromEach.First()) || hasChanged;
+                        break;
+                    default:
+                        bool didChange = false;
+                        var cells = hiddenRemaining.Cells;
+                        foreach (var cell in cells)
+                        {
+                            didChange = cell.TryReduceRemaining(hiddenRemaining.ToRemoveFromEach) || didChange;
+                        }
+
+                        return didChange;
+                        break;
+                }
             }
+
             if (row.TryGetHidden(out var rowPair))
             {
-                //todo: only return if SetCellAsSolved is true
-                if (rowPair!.Value.single != null && rowPair.Value.single.Value.one.SetCellAsSolved(rowPair.Value.single.Value.value1.Value))
-                {
-                    hasChanged = true;
-                }
-                if (rowPair.Value.pair != null && UpdatePair(rowPair.Value.pair.Value))
-                {
-                    hasChanged = true;
-                }
-
-                if (rowPair.Value.triple != null && UpdateTriple(rowPair.Value.triple.Value))
-                {
-                    hasChanged = true;
-                }
+                hasChanged = HandleHiddenRemaining(rowPair.Value) || hasChanged;
             }
 
             var tempColumn = columns[rowIndex];
             if (tempColumn.TryGetHidden(out var columnPair))
             {
-                if (columnPair!.Value.single != null && columnPair.Value.single.Value.one.SetCellAsSolved(columnPair.Value.single.Value.value1.Value))
-                {
-                    hasChanged = true;
-                }
-                if (columnPair.Value.pair != null && UpdatePair(columnPair.Value.pair.Value))
-                {
-                    hasChanged = true;
-                }
-
-                if (columnPair.Value.triple != null && UpdateTriple(columnPair.Value.triple.Value))
-                {
-                    hasChanged = true;
-                }
+                hasChanged = HandleHiddenRemaining(columnPair.Value) || hasChanged;
             }
 
             var tempRegionCoordinates = RegionHelper.GetRegionCoordinatesFromRowMajorOrder(rowIndex);
             var tempRegion = regions[tempRegionCoordinates.rowIndex, tempRegionCoordinates.columnIndex];
             if (tempRegion.TryGetHidden(out var regionPair))
             {
-                if (regionPair!.Value.single != null && regionPair.Value.single.Value.one.SetCellAsSolved(regionPair.Value.single.Value.value1.Value))
-                {
-                    hasChanged = true;
-                }
-                if (regionPair.Value.pair != null && UpdatePair(regionPair.Value.pair.Value))
-                {
-                    hasChanged = true;
-                }
-
-                if (regionPair.Value.triple != null && UpdateTriple(regionPair.Value.triple.Value))
-                {
-                    hasChanged = true;
-                }
-            }
-
-            bool UpdatePair((MutableCell one, MutableCell two, CellValue value1, CellValue value2) pair)
-            {
-                var changed = pair.one.TryReduceRemaining(pair.value1, pair.value2);
-                changed = pair.two.TryReduceRemaining(pair.value1, pair.value2) || changed;
-                return changed;
+                hasChanged = HandleHiddenRemaining(regionPair.Value) || hasChanged;
             }
         }
 

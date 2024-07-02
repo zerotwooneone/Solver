@@ -66,12 +66,18 @@ public static class NineCellExtensions
         var remaining = new HashSet<CellValue>(CellValue.AllValues.Where(c => !existing.Contains(c)));
         return (remaining, existing);
     }
+    
+    public readonly struct HiddenRemaining(
+        IReadOnlyCollection<MutableCell> cells,
+        IReadOnlyCollection<CellValue> toRemove)
+    {
+        public IReadOnlyCollection<MutableCell> Cells { get; } = cells;
+        public IReadOnlyCollection<CellValue> ToRemoveFromEach { get; } = toRemove;
+    }
 
     public static bool TryGetHidden(
         this IReadOnlyList<MutableCell> cells,
-        out ((MutableCell one, CellValue value1)? single,
-            (MutableCell one, MutableCell two, CellValue value1, CellValue value2)? pair,
-            (MutableCell one, MutableCell two, MutableCell three, CellValue value1, CellValue value2, CellValue value3)? triple)? result)
+        out HiddenRemaining? result)
     {
         for (var firstIndex = 0; firstIndex < cells.Count - 1; firstIndex++)
         {
@@ -104,9 +110,7 @@ public static class NineCellExtensions
                         //todo: try to remove this check
                         if (cells.FirstOrDefault(c => c.Value == distinctIntersect3[0]) == null)
                         {
-                            result = (single: (first, distinctIntersect3[0]),
-                                pair: null,
-                                triple: null);
+                            result = new HiddenRemaining(new []{first} , new []{distinctIntersect3[0]});
                             return true;
                         }
                     }
@@ -162,9 +166,7 @@ public static class NineCellExtensions
                         continue;
                     }
 
-                    result = (single: null,
-                        pair: null,
-                            triple: (first, second, third, distinctIntersect3[0], distinctIntersect3[1], distinctIntersect3[2]));
+                    result = result = new HiddenRemaining(new []{first, second, third} , new []{distinctIntersect3[0], distinctIntersect3[1], distinctIntersect3[2]});
                     return true;
                 }
 
@@ -200,9 +202,7 @@ public static class NineCellExtensions
                     continue;
                 }
 
-                result = (single: null,
-                    pair: (first, second, distinctIntersect[0], distinctIntersect[1]), 
-                    triple: null);
+                result =result = new HiddenRemaining(new []{first, second} , new []{distinctIntersect[0], distinctIntersect[1]});
                 return true;
             }
         }

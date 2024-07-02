@@ -40,6 +40,11 @@ public class MutableCell(CellValue? value, IEnumerable<CellValue> remainingCellV
         return changed;
     }
 
+    public bool TryReduceRemaining(IEnumerable<CellValue> remaining)
+    {
+        return TryReduceRemaining(remaining as CellValue[] ?? remaining.ToArray());
+    }
+
     public bool TryReduceRemaining(params CellValue[] remaining)
     {
         if (remaining.Length == CellValue.AllValues.Count)
