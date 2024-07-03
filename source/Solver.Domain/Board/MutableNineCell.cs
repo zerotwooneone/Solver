@@ -219,7 +219,19 @@ public class MutableNineCell : IRow, IColumn, IRegion, IReadOnlyList<MutableCell
     {
         var changed = Remaining.Remove(value);
         changed = Solved.Add(value)|| changed;
+        
         //todo: consider looking for more solutions
+
+        changed = A.TryRemoveRemaining(value) || changed;
+        changed = B.TryRemoveRemaining(value) || changed;
+        changed = C.TryRemoveRemaining(value) || changed;
+        changed = D.TryRemoveRemaining(value) || changed;
+        changed = E.TryRemoveRemaining(value) || changed;
+        changed = F.TryRemoveRemaining(value) || changed;
+        changed = G.TryRemoveRemaining(value) || changed;
+        changed = H.TryRemoveRemaining(value) || changed;
+        changed = I.TryRemoveRemaining(value) || changed;
+        
         return changed;
     }
 }

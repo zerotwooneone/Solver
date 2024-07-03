@@ -1,11 +1,11 @@
 ﻿using System.Collections.Immutable;
-using System.Diagnostics;
 using Solver.Domain.Cell;
 
 namespace Solver.Domain.Board;
 
 public class BoardSolver
 {
+    const int boardSize = 9;
     public GameBoard GetSolvedBoard(GameBoard board)
     {
         if (!board.GetIsValid())
@@ -21,9 +21,11 @@ public class BoardSolver
         int sanityCount = 0;
         var (rows, columns, regions) = GetMutable(board);
         bool doRecheck;
+        TrySolve(rows);
         do
         {
-            doRecheck = TryReduce(rows, columns, regions);
+            doRecheck = TryFindHidden(rows, columns, regions);
+            doRecheck = TrySolve(rows) || doRecheck;
             if (sanityCount++ > sanityMaximum)
             {
                 throw new Exception("sanity check exceeded");
@@ -78,13 +80,11 @@ public class BoardSolver
             regions);
     }
 
-    private static bool TryReduce(
-        IReadOnlyList<MutableNineCell> rows, 
-        IReadOnlyList<MutableNineCell> columns, 
-        MutableRegionCollection regions)
+    private static bool TrySolve(
+        IReadOnlyList<MutableNineCell> rows)
     {
         bool hasChanged = false;
-        const int boardSize = 9;
+        
         for (var rowIndex = 0; rowIndex < boardSize; rowIndex++)
         {
             var row = rows[rowIndex];
@@ -92,26 +92,39 @@ public class BoardSolver
             for (var columnIndex = 0; columnIndex < boardSize; columnIndex++)
             {
                 var cell = rows[rowIndex][columnIndex];
-                hasChanged = cell.TryReduce() || hasChanged;
+                
+                hasChanged = cell.UpdateSolveState();
+                hasChanged = cell.TryReduceRemaining() || hasChanged;
+                hasChanged = cell.TrySolveFromRemaining() || hasChanged;
             }
+        }
 
-            bool HandleHiddenRemaining(NineCellExtensions.HiddenRemaining hiddenRemaining)
-            {
-                switch (hiddenRemaining.Cells.Count)
+        return hasChanged;
+    }
+
+    private static bool TryFindHidden(IReadOnlyList<MutableNineCell> rows, IReadOnlyList<MutableNineCell> columns, MutableRegionCollection regions)
+    {
+        bool hasChanged = false;
+        for (int positionIndex = 0; positionIndex < boardSize; positionIndex++)
+        {
+            var row = rows[positionIndex];
+            var rowCorners = (new[]
                 {
-                    case 1:
-                        return hiddenRemaining.Cells.First().SetCellAsSolved(hiddenRemaining.NewRemainingValues.First()) || hasChanged;
-                        break;
-                    default:
-                        bool didChange = false;
-                        var cells = hiddenRemaining.Cells;
-                        foreach (var cell in cells)
-                        {
-                            didChange = cell.TryReduceRemaining(hiddenRemaining.NewRemainingValues) || didChange;
-                        }
-
-                        return didChange;
-                        break;
+                    RegionHelper.GetRegionCoordinates(positionIndex, 0), RegionHelper.GetRegionCoordinates(positionIndex, 3),
+                    RegionHelper.GetRegionCoordinates(positionIndex, 8)
+                })
+                .Select(t => regions[t.rowIndex, t.columnIndex]);
+            foreach (var rowCorner in rowCorners)
+            {
+                var otherRegionCells =
+                    ((IReadOnlyList<MutableCell>) rowCorner).Where(c => !row.Contains(c)).ToArray();
+                var regionCells = ((IReadOnlyList<MutableCell>) rowCorner).Where(c => !otherRegionCells.Contains(c))
+                    .ToArray();
+                var otherCells = ((IReadOnlyList<MutableCell>) row).Where(c => !regionCells.Contains(c)).ToArray();
+                if (NineCellExtensions.TryGetPointing(regionCells, otherRegionCells, otherCells,
+                        out var rowHiddenRemaining))
+                {
+                    //hasChanged = rowHiddenRemaining.Aggregate(hasChanged, (current, hiddenRemaining) => HandleHiddenRemaining(hiddenRemaining) || current);
                 }
             }
 
@@ -120,13 +133,34 @@ public class BoardSolver
                 hasChanged = HandleHiddenRemaining(rowPair.Value) || hasChanged;
             }
 
-            var tempColumn = columns[rowIndex];
+            var tempColumn = columns[positionIndex];
+            var columnCorners = (new[]
+                {
+                    RegionHelper.GetRegionCoordinates(0, positionIndex), RegionHelper.GetRegionCoordinates(3, positionIndex),
+                    RegionHelper.GetRegionCoordinates(8, positionIndex)
+                })
+                .Select(t => regions[t.rowIndex, t.columnIndex]);
+            foreach (var columnCornerCorner in columnCorners)
+            {
+                var otherRegionCells = ((IReadOnlyList<MutableCell>) columnCornerCorner)
+                    .Where(c => !tempColumn.Contains(c)).ToArray();
+                var regionCells = ((IReadOnlyList<MutableCell>) columnCornerCorner)
+                    .Where(c => !otherRegionCells.Contains(c)).ToArray();
+                var otherCells = ((IReadOnlyList<MutableCell>) tempColumn).Where(c => !regionCells.Contains(c))
+                    .ToArray();
+                if (NineCellExtensions.TryGetPointing(regionCells, otherRegionCells, otherCells,
+                        out var columnHiddenRemaining))
+                {
+                    //hasChanged = columnHiddenRemaining.Aggregate(hasChanged, (current, hiddenRemaining) => HandleHiddenRemaining(hiddenRemaining) || current);
+                }
+            }
+
             if (tempColumn.TryGetHidden(out var columnPair))
             {
                 hasChanged = HandleHiddenRemaining(columnPair.Value) || hasChanged;
             }
 
-            var tempRegionCoordinates = RegionHelper.GetRegionCoordinatesFromRowMajorOrder(rowIndex);
+            var tempRegionCoordinates = RegionHelper.GetRegionCoordinatesFromRowMajorOrder(positionIndex);
             var tempRegion = regions[tempRegionCoordinates.rowIndex, tempRegionCoordinates.columnIndex];
             if (tempRegion.TryGetHidden(out var regionPair))
             {
@@ -136,6 +170,26 @@ public class BoardSolver
 
         return hasChanged;
     }
-
     
+    private static bool HandleHiddenRemaining(NineCellExtensions.HiddenRemaining hiddenRemaining)
+    {
+        switch (hiddenRemaining.Cells.Count)
+        {
+            case 1:
+                return hiddenRemaining.Cells.First()
+                    .TrySetCellAsSolved(hiddenRemaining.NewRemainingValues.First());
+                break;
+            default:
+                bool didChange = false;
+                var cells = hiddenRemaining.Cells;
+                foreach (var cell in cells)
+                {
+                    didChange = cell.TryReduceRemaining(hiddenRemaining.NewRemainingValues) || didChange;
+                    didChange = cell.TrySolveFromRemaining() || didChange;
+                }
+
+                return didChange;
+                break;
+        }
+    }
 }

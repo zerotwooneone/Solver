@@ -1,8 +1,8 @@
 ﻿namespace Solver.Domain.Cell;
 
-public class PartialCell(CellValue? value, IEnumerable<CellValue> remainingValues) : ICell
+public class PartialCell(CellValue? initialValue, IEnumerable<CellValue> remainingValues) : ICell
 {
-    public CellValue? Value { get; } = value;
+    public CellValue? Value { get; } = initialValue;
     public IReadOnlySet<CellValue> RemainingCellValues { get; } = new HashSet<CellValue>(remainingValues);
 
     public override string ToString()

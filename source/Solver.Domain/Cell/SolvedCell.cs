@@ -1,14 +1,14 @@
 ﻿namespace Solver.Domain.Cell;
 
-public class SolvedCell(CellValue value) : ICell
+public class SolvedCell(CellValue initialValue) : ICell
 {
-    public CellValue? Value { get; } = value;
+    public CellValue? Value { get; } = initialValue;
     private static readonly HashSet<CellValue> Empty = new();
     public IReadOnlySet<CellValue> RemainingCellValues => Empty;
 
     public override string ToString()
     {
-        return value.ToString();
+        return initialValue.ToString();
     }
 
     public override int GetHashCode()
