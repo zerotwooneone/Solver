@@ -87,8 +87,6 @@ public class BoardSolver
         
         for (var rowIndex = 0; rowIndex < boardSize; rowIndex++)
         {
-            var row = rows[rowIndex];
-            
             for (var columnIndex = 0; columnIndex < boardSize; columnIndex++)
             {
                 var cell = rows[rowIndex][columnIndex];
