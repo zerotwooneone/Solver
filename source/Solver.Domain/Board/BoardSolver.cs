@@ -108,7 +108,8 @@ public class BoardSolver
             var row = rows[positionIndex];
             var rowCorners = (new[]
                 {
-                    RegionHelper.GetRegionCoordinates(positionIndex, 0), RegionHelper.GetRegionCoordinates(positionIndex, 3),
+                    RegionHelper.GetRegionCoordinates(positionIndex, 0), 
+                    RegionHelper.GetRegionCoordinates(positionIndex, 3),
                     RegionHelper.GetRegionCoordinates(positionIndex, 8)
                 })
                 .Select(t => regions[t.rowIndex, t.columnIndex]);
@@ -122,7 +123,7 @@ public class BoardSolver
                 if (NineCellExtensions.TryGetPointing(regionCells, otherRegionCells, otherCells,
                         out var rowHiddenRemaining))
                 {
-                    //hasChanged = rowHiddenRemaining.Aggregate(hasChanged, (current, hiddenRemaining) => HandleHiddenRemaining(hiddenRemaining) || current);
+                    hasChanged = rowHiddenRemaining.Aggregate(hasChanged, (current, hiddenRemaining) => HandleHiddenRemaining(hiddenRemaining) || current);
                 }
             }
 
@@ -134,7 +135,8 @@ public class BoardSolver
             var tempColumn = columns[positionIndex];
             var columnCorners = (new[]
                 {
-                    RegionHelper.GetRegionCoordinates(0, positionIndex), RegionHelper.GetRegionCoordinates(3, positionIndex),
+                    RegionHelper.GetRegionCoordinates(0, positionIndex), 
+                    RegionHelper.GetRegionCoordinates(3, positionIndex),
                     RegionHelper.GetRegionCoordinates(8, positionIndex)
                 })
                 .Select(t => regions[t.rowIndex, t.columnIndex]);
@@ -149,7 +151,7 @@ public class BoardSolver
                 if (NineCellExtensions.TryGetPointing(regionCells, otherRegionCells, otherCells,
                         out var columnHiddenRemaining))
                 {
-                    //hasChanged = columnHiddenRemaining.Aggregate(hasChanged, (current, hiddenRemaining) => HandleHiddenRemaining(hiddenRemaining) || current);
+                    hasChanged = columnHiddenRemaining.Aggregate(hasChanged, (current, hiddenRemaining) => HandleHiddenRemaining(hiddenRemaining) || current);
                 }
             }
 
@@ -171,23 +173,20 @@ public class BoardSolver
     
     private static bool HandleHiddenRemaining(NineCellExtensions.HiddenRemaining hiddenRemaining)
     {
-        switch (hiddenRemaining.Cells.Count)
+        if (hiddenRemaining.Cells.Count == 1 &&
+            hiddenRemaining.NewRemainingValues.Count == 1)
         {
-            case 1:
-                return hiddenRemaining.Cells.First()
-                    .TrySetCellAsSolved(hiddenRemaining.NewRemainingValues.First());
-                break;
-            default:
-                bool didChange = false;
-                var cells = hiddenRemaining.Cells;
-                foreach (var cell in cells)
-                {
-                    didChange = cell.TryReduceRemaining(hiddenRemaining.NewRemainingValues) || didChange;
-                    didChange = cell.TrySolveFromRemaining() || didChange;
-                }
-
-                return didChange;
-                break;
+            return hiddenRemaining.Cells.First()
+                .TrySetCellAsSolved(hiddenRemaining.NewRemainingValues.First());
         }
+        bool didChange = false;
+        var cells = hiddenRemaining.Cells;
+        foreach (var cell in cells)
+        {
+            didChange = cell.TryReduceRemaining(hiddenRemaining.NewRemainingValues) || didChange;
+            didChange = cell.TrySolveFromRemaining() || didChange;
+        }
+
+        return didChange;
     }
 }
