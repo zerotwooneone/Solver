@@ -72,7 +72,7 @@ public static class NineCellExtensions
         IReadOnlyCollection<CellValue> toRemove)
     {
         public IReadOnlyCollection<MutableCell> Cells { get; } = cells;
-        public IReadOnlyCollection<CellValue> ToRemoveFromEach { get; } = toRemove;
+        public IReadOnlyCollection<CellValue> NewRemainingValues { get; } = toRemove;
     }
 
     public static bool TryGetHidden(
@@ -209,5 +209,102 @@ public static class NineCellExtensions
 
         result = null;
         return false;
+    }
+    
+    public static bool TryGetPointing(
+        IReadOnlyList<MutableCell> regionCells,
+        IReadOnlyList<MutableCell> otherRegionCells,
+        IReadOnlyList<MutableCell> otherCells,
+        out IEnumerable<HiddenRemaining>? result)
+    {
+        if (regionCells.Count != 3)
+        {
+            throw new ArgumentException($"{nameof(regionCells)} must have 3 cells");
+        }
+        if (otherRegionCells.Count != 6)
+        {
+            throw new ArgumentException($"{nameof(otherRegionCells)} must have 6 cells");
+        }
+
+        if (otherCells.Count != 6)
+        {
+            throw new ArgumentException($"{nameof(otherCells)} must have 6 cells");
+        }
+
+        var otherRegionRemaining = otherRegionCells.Select(c => c.RemainingCellValues).UnionSelf().ToHashSet();
+
+        var commonTriple = regionCells.Select(c=>c.RemainingCellValues.Where(v=>!otherRegionRemaining.Contains(v))).IntersectSelf().ToHashSet();
+        
+        var list = new List<HiddenRemaining>();
+        if (commonTriple.Count != 0)
+        {
+            var tripleMatches = otherCells
+                .Select(c => (cell: c, remaining:c.RemainingCellValues.Where(v => !commonTriple.Contains(v)).ToArray()))
+                .Where(t => t.remaining.Length < t.cell.RemainingCellValues.Count);
+            foreach (var tripleMatch in tripleMatches)
+            {
+                list.Add(new HiddenRemaining( new []{tripleMatch.cell}, tripleMatch.remaining));
+            }
+        }
+        
+        var pair1 = regionCells.Take(2);
+        var pair1Commons = pair1.Select(c=>c.RemainingCellValues.Where(v=>!otherRegionRemaining.Contains(v))).IntersectSelf().Where(v=> !commonTriple.Contains(v));
+        if (pair1Commons.Count() != 0)
+        {
+            var matches = otherCells
+                .Select(c => (cell: c, remaining:c.RemainingCellValues.Where(v => !pair1Commons.Contains(v)).ToArray()))
+                .Where(t => t.remaining.Length < t.cell.RemainingCellValues.Count);
+            foreach (var match in matches)
+            {
+                list.Add(new HiddenRemaining( new []{match.cell}, match.remaining));
+            }
+        }
+        var pair2 = regionCells.Skip(1).Take(2);
+        var pair2Commons = pair2.Select(c=>c.RemainingCellValues.Where(v=>!otherRegionRemaining.Contains(v))).IntersectSelf().Where(v=> !commonTriple.Contains(v));
+        if (pair2Commons.Count() != 0)
+        {
+            var matches = otherCells
+                .Select(c => (cell: c, remaining:c.RemainingCellValues.Where(v => !pair2Commons.Contains(v)).ToArray()))
+                .Where(t => t.remaining.Length < t.cell.RemainingCellValues.Count);
+            foreach (var match in matches)
+            {
+                list.Add(new HiddenRemaining( new []{match.cell}, match.remaining));
+            }
+        }
+        var pair3 = new[]{ regionCells[0], regionCells[2] };
+        var pair3Commons = pair3.Select(c=>c.RemainingCellValues.Where(v=>!otherRegionRemaining.Contains(v))).IntersectSelf().Where(v=> !commonTriple.Contains(v));
+        if (pair3Commons.Count() != 0)
+        {
+            var matches = otherCells
+                .Select(c => (cell: c, remaining:c.RemainingCellValues.Where(v => !pair3Commons.Contains(v)).ToArray()))
+                .Where(t => t.remaining.Length < t.cell.RemainingCellValues.Count);
+            foreach (var match in matches)
+            {
+                list.Add(new HiddenRemaining( new []{match.cell}, match.remaining));
+            }
+        }
+
+        if (list.Count == 0)
+        {
+            result = null;
+            return false;
+        }
+
+        result = list;
+        return true;
+    }
+
+    private static IEnumerable<T> IntersectSelf<T>(
+        this IEnumerable<IEnumerable<T>> outer)
+    {
+        return outer.Skip(1).Aggregate(outer.First(),
+            (a, c) => a.Intersect(c));
+    }
+    
+    private static IEnumerable<T> UnionSelf<T>(
+        this IEnumerable<IEnumerable<T>> outer)
+    {
+        return outer.Skip(1).Aggregate(outer.First(),
+            (a, c) => a.Union(c));
     }
 }

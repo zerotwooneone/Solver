@@ -52,8 +52,8 @@ public class MutableCell(CellValue? value, IEnumerable<CellValue> remainingCellV
             return false;
         }
 
-        return RemainingCellValues.Aggregate(false,(hc,currentCell)=> (!remaining.Contains(currentCell) &&
-                                                                       RemainingCellValues.Remove(currentCell)) || hc);
+        return RemainingCellValues.Aggregate(false,(hasChanged,value)=> (!remaining.Contains(value) &&
+                                                                       RemainingCellValues.Remove(value)) || hasChanged);
     }
     
     public bool TryReduce()

@@ -100,14 +100,14 @@ public class BoardSolver
                 switch (hiddenRemaining.Cells.Count)
                 {
                     case 1:
-                        return hiddenRemaining.Cells.First().SetCellAsSolved(hiddenRemaining.ToRemoveFromEach.First()) || hasChanged;
+                        return hiddenRemaining.Cells.First().SetCellAsSolved(hiddenRemaining.NewRemainingValues.First()) || hasChanged;
                         break;
                     default:
                         bool didChange = false;
                         var cells = hiddenRemaining.Cells;
                         foreach (var cell in cells)
                         {
-                            didChange = cell.TryReduceRemaining(hiddenRemaining.ToRemoveFromEach) || didChange;
+                            didChange = cell.TryReduceRemaining(hiddenRemaining.NewRemainingValues) || didChange;
                         }
 
                         return didChange;
