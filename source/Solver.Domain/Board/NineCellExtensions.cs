@@ -340,13 +340,14 @@ public static class NineCellExtensions
             foreach (var pair in pairs)
             {
                 var withCommonRemaining = withGt2Remaining
-                    .Where(c=>pair.commonRemaining.Any(v=>pair.commonRemaining.Contains(v)))
+                    .Where(c=>pair.commonRemaining.Any(v=>c.RemainingCellValues.Contains(v)))
                     .ToArray();
                 foreach (var target in withCommonRemaining)
                 {
+                    var targetRemaining = target.RemainingCellValues.Where(v=>!pair.commonRemaining.Contains(v)).ToArray();
                     result.Add(new HiddenRemaining(
                         new []{target}, 
-                        target.RemainingCellValues.Where(v=>!pair.commonRemaining.Contains(v)).ToArray()));
+                        targetRemaining));
                 }
             }
         }
