@@ -1,4 +1,5 @@
 ﻿using Solver.Domain.Cell;
+using Solver.Domain.SystemCollections;
 
 namespace Solver.Domain.Board;
 
@@ -306,5 +307,56 @@ public static class NineCellExtensions
     {
         return outer.Skip(1).Aggregate(outer.First(),
             (a, c) => a.Union(c));
+    }
+
+    public static bool TryGetNaked(IReadOnlyList<MutableCell> cells, out IEnumerable<HiddenRemaining>? hiddenRemaining)
+    {
+        var withoutValues = cells.Where(c => c.Value == null).ToArray();
+        if (withoutValues.Length < 2)
+        {
+            hiddenRemaining = null;
+            return false;
+        }
+
+        var result = new List<HiddenRemaining>();
+
+        var with2Remaining = withoutValues
+            .Where(c=>c.RemainingCellValues.Count == 2)
+            .ToArray();
+        var withGt2Remaining = withoutValues
+            .Where(c=>c.RemainingCellValues.Count > 2)
+            .ToArray();
+        if (with2Remaining.Length > 1 && withGt2Remaining.Length > 0)
+        {
+            var pairs = with2Remaining
+                .Permutate(2)
+                .Select(p =>
+                {
+                    var union = p.Select(c => c.RemainingCellValues).UnionSelf().ToArray();
+                    return (cells: p, commonRemaining: union);
+                })
+                .Where(t=>t.commonRemaining.Length == 2)
+                .ToArray();
+            foreach (var pair in pairs)
+            {
+                var withCommonRemaining = withGt2Remaining
+                    .Where(c=>pair.commonRemaining.Any(v=>pair.commonRemaining.Contains(v)))
+                    .ToArray();
+                foreach (var target in withCommonRemaining)
+                {
+                    result.Add(new HiddenRemaining(
+                        new []{target}, 
+                        target.RemainingCellValues.Where(v=>!pair.commonRemaining.Contains(v)).ToArray()));
+                }
+            }
+        }
+        if (result.Count > 0)
+        {
+            hiddenRemaining = result;
+            return true;
+        }
+
+        hiddenRemaining = null;
+        return false;
     }
 }

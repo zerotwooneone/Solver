@@ -1,4 +1,5 @@
-﻿using Solver.Domain.Board;
+﻿using System.Collections;
+using Solver.Domain.Board;
 using Solver.Domain.Cell;
 
 namespace Solver.Domain.Tests.Board;
@@ -154,5 +155,42 @@ public class NineCellExtensionTests
         
         Assert.AreEqual(6,firstActual.NewRemainingValues.Count);
         CollectionAssert.AreEquivalent(new CellValue[]{2,3,5,7,8,9}, firstActual.NewRemainingValues);
+    }
+    
+    [Test]
+    public void TryGetNaked_SingleExists_AndFound()
+    {
+        var row = new MutableNineCell(0);
+        var column = new MutableNineCell(0);
+        var region = new MutableNineCell(0);
+        var expectedCell1 = new MutableCell(null, new CellValue[] {1,2,4, 7}, row, column, region);
+        var expectedCell2 = new MutableCell(null, new CellValue[] {1,2,4, 7}, row, column, region);
+        var cells = new[]
+        {
+            new MutableCell(3, Array.Empty<CellValue>(), row, column, region),
+            new MutableCell(5, Array.Empty<CellValue>(), row, column, region),
+            new MutableCell(null, new CellValue[] {1, 7}, row, column, region),
+            new MutableCell(null, new CellValue[] {1,7}, row, column, region),
+            expectedCell1,
+            expectedCell2,
+            new MutableCell(8, Array.Empty<CellValue>(), row, column, region),
+            new MutableCell(6, Array.Empty<CellValue>(), row, column, region),
+            new MutableCell(9, Array.Empty<CellValue>(), row, column, region),
+        };
+        var actual = NineCellExtensions.TryGetNaked(cells, out var hidden);
+        Assert.IsTrue(actual);
+        
+        var expectedRemaining = new CellValue[] { 2, 4};
+
+        Assert.IsNotNull(hidden);
+        var actualArray = hidden.ToArray();
+        var actualCell1 = actualArray.FirstOrDefault(t=>t.Cells.Count == 1 && t.Cells.First().Equals(expectedCell1));
+        Assert.IsNotNull(actualCell1);
+        CollectionAssert.AreEquivalent(expectedRemaining, actualCell1.NewRemainingValues);
+        
+        var actualCell2 = actualArray.FirstOrDefault(t=>t.Cells.Count == 1 && t.Cells.First().Equals(expectedCell2));
+        Assert.IsNotNull(actualCell2);
+        CollectionAssert.AreEquivalent(expectedRemaining, actualCell2.NewRemainingValues);
+        
     }
 }
