@@ -311,6 +311,7 @@ public static class NineCellExtensions
 
     public static bool TryGetNaked(this IReadOnlyList<MutableCell> cells, out IEnumerable<HiddenRemaining>? hiddenRemaining)
     {
+        //todo: extend this to include triples and quads
         var withoutValues = cells.Where(c => c.Value == null).ToArray();
         if (withoutValues.Length < 2)
         {

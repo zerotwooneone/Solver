@@ -136,6 +136,14 @@ public class BoardSolver
             {
                 hasChanged = HandleHiddenRemaining(rowPair.Value) || hasChanged;
             }
+            
+            if (row.TryGetNaked(out var rowNaked))
+            {
+                foreach (var hiddenRemaining in rowNaked)
+                {
+                    hasChanged = HandleHiddenRemaining(hiddenRemaining) || hasChanged;
+                }
+            }
 
             var tempColumn = columns[positionIndex];
             var columnCorners = (new[]
@@ -169,12 +177,28 @@ public class BoardSolver
             {
                 hasChanged = HandleHiddenRemaining(columnPair.Value) || hasChanged;
             }
+            
+            if (tempColumn.TryGetNaked(out var columnNaked))
+            {
+                foreach (var hiddenRemaining in columnNaked)
+                {
+                    hasChanged = HandleHiddenRemaining(hiddenRemaining) || hasChanged;
+                }
+            }
 
             var tempRegionCoordinates = RegionHelper.GetRegionCoordinatesFromRowMajorOrder(positionIndex);
             var tempRegion = regions[tempRegionCoordinates.rowIndex, tempRegionCoordinates.columnIndex];
             if (tempRegion.TryGetHidden(out var regionPair))
             {
                 hasChanged = HandleHiddenRemaining(regionPair.Value) || hasChanged;
+            }
+            
+            if (tempRegion.TryGetNaked(out var regionNaked))
+            {
+                foreach (var hiddenRemaining in regionNaked)
+                {
+                    hasChanged = HandleHiddenRemaining(hiddenRemaining) || hasChanged;
+                }
             }
         }
 
