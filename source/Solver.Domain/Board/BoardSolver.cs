@@ -125,6 +125,11 @@ public class BoardSolver
                 {
                     hasChanged = rowHiddenRemaining.Aggregate(hasChanged, (current, hiddenRemaining) => HandleHiddenRemaining(hiddenRemaining) || current);
                 }
+                if (NineCellExtensions.TryGetPointing(regionCells,  otherCells,otherRegionCells,
+                        out var rowHiddenRemaining2))
+                {
+                    hasChanged = rowHiddenRemaining2.Aggregate(hasChanged, (current, hiddenRemaining) => HandleHiddenRemaining(hiddenRemaining) || current);
+                }
             }
 
             if (row.TryGetHidden(out var rowPair))
@@ -152,6 +157,11 @@ public class BoardSolver
                         out var columnHiddenRemaining))
                 {
                     hasChanged = columnHiddenRemaining.Aggregate(hasChanged, (current, hiddenRemaining) => HandleHiddenRemaining(hiddenRemaining) || current);
+                }
+                if (NineCellExtensions.TryGetPointing(regionCells,  otherCells,otherRegionCells,
+                        out var columnHiddenRemaining2))
+                {
+                    hasChanged = columnHiddenRemaining2.Aggregate(hasChanged, (current, hiddenRemaining) => HandleHiddenRemaining(hiddenRemaining) || current);
                 }
             }
 
