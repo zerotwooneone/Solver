@@ -309,7 +309,7 @@ public static class NineCellExtensions
             (a, c) => a.Union(c));
     }
 
-    public static bool TryGetNaked(IReadOnlyList<MutableCell> cells, out IEnumerable<HiddenRemaining>? hiddenRemaining)
+    public static bool TryGetNaked(this IReadOnlyList<MutableCell> cells, out IEnumerable<HiddenRemaining>? hiddenRemaining)
     {
         var withoutValues = cells.Where(c => c.Value == null).ToArray();
         if (withoutValues.Length < 2)

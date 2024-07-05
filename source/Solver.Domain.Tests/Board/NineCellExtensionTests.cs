@@ -177,7 +177,7 @@ public class NineCellExtensionTests
             new MutableCell(6, Array.Empty<CellValue>(), row, column, region),
             new MutableCell(9, Array.Empty<CellValue>(), row, column, region),
         };
-        var actual = NineCellExtensions.TryGetNaked(cells, out var hidden);
+        var actual = cells.TryGetNaked(out var hidden);
         Assert.IsTrue(actual);
         
         var expectedRemaining = new CellValue[] { 2, 4};
