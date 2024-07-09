@@ -123,12 +123,12 @@ public class BoardSolver
                 if (NineCellExtensions.TryGetPointing(regionCells, otherRegionCells, otherCells,
                         out var rowHiddenRemaining))
                 {
-                    hasChanged = rowHiddenRemaining.Aggregate(hasChanged, (current, hiddenRemaining) => HandleHiddenRemaining(hiddenRemaining) || current);
+                    hasChanged = rowHiddenRemaining.Aggregate(hasChanged, (current, hiddenRemaining) => HandleCellsToUpdate(hiddenRemaining) || current);
                 }
                 if (NineCellExtensions.TryGetPointing(regionCells,  otherCells,otherRegionCells,
                         out var rowHiddenRemaining2))
                 {
-                    hasChanged = rowHiddenRemaining2.Aggregate(hasChanged, (current, hiddenRemaining) => HandleHiddenRemaining(hiddenRemaining) || current);
+                    hasChanged = rowHiddenRemaining2.Aggregate(hasChanged, (current, hiddenRemaining) => HandleCellsToUpdate(hiddenRemaining) || current);
                 }
             }
 
@@ -164,12 +164,12 @@ public class BoardSolver
                 if (NineCellExtensions.TryGetPointing(regionCells, otherRegionCells, otherCells,
                         out var columnHiddenRemaining))
                 {
-                    hasChanged = columnHiddenRemaining.Aggregate(hasChanged, (current, hiddenRemaining) => HandleHiddenRemaining(hiddenRemaining) || current);
+                    hasChanged = columnHiddenRemaining.Aggregate(hasChanged, (current, hiddenRemaining) => HandleCellsToUpdate(hiddenRemaining) || current);
                 }
                 if (NineCellExtensions.TryGetPointing(regionCells,  otherCells,otherRegionCells,
                         out var columnHiddenRemaining2))
                 {
-                    hasChanged = columnHiddenRemaining2.Aggregate(hasChanged, (current, hiddenRemaining) => HandleHiddenRemaining(hiddenRemaining) || current);
+                    hasChanged = columnHiddenRemaining2.Aggregate(hasChanged, (current, hiddenRemaining) => HandleCellsToUpdate(hiddenRemaining) || current);
                 }
             }
 

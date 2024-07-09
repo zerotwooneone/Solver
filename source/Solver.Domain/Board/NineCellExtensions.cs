@@ -221,10 +221,10 @@ public static class NineCellExtensions
     }
     
     public static bool TryGetPointing(
-        IReadOnlyList<MutableCell> regionCells,
-        IReadOnlyList<MutableCell> otherRegionCells,
-        IReadOnlyList<MutableCell> otherCells,
-        out IEnumerable<HiddenRemaining>? result)
+        IReadOnlyList<ICell> regionCells,
+        IReadOnlyList<ICell> otherRegionCells,
+        IReadOnlyList<ICell> otherCells,
+        out IEnumerable<CellsToUpdate>? result)
     {
         if (regionCells.Count != 3)
         {
@@ -244,7 +244,7 @@ public static class NineCellExtensions
 
         var commonTriple = regionCells.Select(c=>c.RemainingCellValues.Where(v=>!otherRegionRemaining.Contains(v))).IntersectSelf().ToHashSet();
         
-        var list = new List<HiddenRemaining>();
+        var list = new List<CellsToUpdate>();
         if (commonTriple.Count != 0)
         {
             var tripleMatches = otherCells
@@ -252,7 +252,7 @@ public static class NineCellExtensions
                 .Where(t => t.remaining.Length < t.cell.RemainingCellValues.Count);
             foreach (var tripleMatch in tripleMatches)
             {
-                list.Add(new HiddenRemaining( new []{tripleMatch.cell}, tripleMatch.remaining));
+                list.Add(new CellsToUpdate( new []{tripleMatch.cell}, tripleMatch.remaining));
             }
         }
         
@@ -265,7 +265,7 @@ public static class NineCellExtensions
                 .Where(t => t.remaining.Length < t.cell.RemainingCellValues.Count);
             foreach (var match in matches)
             {
-                list.Add(new HiddenRemaining( new []{match.cell}, match.remaining));
+                list.Add(new CellsToUpdate( new []{match.cell}, match.remaining));
             }
         }
         var pair2 = regionCells.Skip(1).Take(2);
@@ -277,7 +277,7 @@ public static class NineCellExtensions
                 .Where(t => t.remaining.Length < t.cell.RemainingCellValues.Count);
             foreach (var match in matches)
             {
-                list.Add(new HiddenRemaining( new []{match.cell}, match.remaining));
+                list.Add(new CellsToUpdate( new []{match.cell}, match.remaining));
             }
         }
         var pair3 = new[]{ regionCells[0], regionCells[2] };
@@ -289,7 +289,7 @@ public static class NineCellExtensions
                 .Where(t => t.remaining.Length < t.cell.RemainingCellValues.Count);
             foreach (var match in matches)
             {
-                list.Add(new HiddenRemaining( new []{match.cell}, match.remaining));
+                list.Add(new CellsToUpdate( new []{match.cell}, match.remaining));
             }
         }
 
