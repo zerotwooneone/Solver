@@ -141,7 +141,7 @@ public class BoardSolver
             {
                 foreach (var hiddenRemaining in rowNaked)
                 {
-                    hasChanged = HandleHiddenRemaining(hiddenRemaining) || hasChanged;
+                    hasChanged = HandleCellsToUpdate(hiddenRemaining) || hasChanged;
                 }
             }
 
@@ -182,7 +182,7 @@ public class BoardSolver
             {
                 foreach (var hiddenRemaining in columnNaked)
                 {
-                    hasChanged = HandleHiddenRemaining(hiddenRemaining) || hasChanged;
+                    hasChanged = HandleCellsToUpdate(hiddenRemaining) || hasChanged;
                 }
             }
 
@@ -197,7 +197,7 @@ public class BoardSolver
             {
                 foreach (var hiddenRemaining in regionNaked)
                 {
-                    hasChanged = HandleHiddenRemaining(hiddenRemaining) || hasChanged;
+                    hasChanged = HandleCellsToUpdate(hiddenRemaining) || hasChanged;
                 }
             }
         }
@@ -218,6 +218,25 @@ public class BoardSolver
         foreach (var cell in cells)
         {
             didChange = cell.TryReduceRemaining(hiddenRemaining.NewRemainingValues) || didChange;
+            didChange = cell.TrySolveFromRemaining() || didChange;
+        }
+
+        return didChange;
+    }
+    
+    private static bool HandleCellsToUpdate(NineCellExtensions.CellsToUpdate cellsToUpdate)
+    {
+        if (cellsToUpdate.Cells.Count == 1 &&
+            cellsToUpdate.NewRemainingValues.Count == 1)
+        {
+            return ((MutableCell)cellsToUpdate.Cells.First())
+                .TrySetCellAsSolved(cellsToUpdate.NewRemainingValues.First());
+        }
+        bool didChange = false;
+        var cells = cellsToUpdate.Cells;
+        foreach (var cell in cells.Cast<MutableCell>())
+        {
+            didChange = cell.TryReduceRemaining(cellsToUpdate.NewRemainingValues) || didChange;
             didChange = cell.TrySolveFromRemaining() || didChange;
         }
 

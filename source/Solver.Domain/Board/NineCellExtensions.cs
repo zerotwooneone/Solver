@@ -70,10 +70,18 @@ public static class NineCellExtensions
     
     public readonly struct HiddenRemaining(
         IReadOnlyCollection<MutableCell> cells,
-        IReadOnlyCollection<CellValue> toRemove)
+        IReadOnlyCollection<CellValue> newRemainingValues)
     {
         public IReadOnlyCollection<MutableCell> Cells { get; } = cells;
-        public IReadOnlyCollection<CellValue> NewRemainingValues { get; } = toRemove;
+        public IReadOnlyCollection<CellValue> NewRemainingValues { get; } = newRemainingValues;
+    }
+    
+    public readonly struct CellsToUpdate(
+        IReadOnlyCollection<ICell> cells,
+        IReadOnlyCollection<CellValue> newRemainingValues)
+    {
+        public IReadOnlyCollection<ICell> Cells { get; } = cells;
+        public IReadOnlyCollection<CellValue> NewRemainingValues { get; } = newRemainingValues;
     }
 
     public static bool TryGetHidden(
@@ -309,8 +317,9 @@ public static class NineCellExtensions
             (a, c) => a.Union(c));
     }
 
-    public static bool TryGetNaked(this IReadOnlyList<MutableCell> cells, out IEnumerable<HiddenRemaining>? hiddenRemaining)
+    public static bool TryGetNaked(this IReadOnlyList<ICell> cells, out IEnumerable<CellsToUpdate>? hiddenRemaining)
     {
+        if (cells.Count != 9) throw new ArgumentException("cells must have a count of 9");
         //todo: extend this to include triples and quads
         var withoutValues = cells.Where(c => c.Value == null).ToArray();
         if (withoutValues.Length < 2)
@@ -319,7 +328,7 @@ public static class NineCellExtensions
             return false;
         }
 
-        var result = new List<HiddenRemaining>();
+        var result = new List<CellsToUpdate>();
 
         var with2Remaining = withoutValues
             .Where(c=>c.RemainingCellValues.Count == 2)
@@ -346,7 +355,7 @@ public static class NineCellExtensions
                 foreach (var target in withCommonRemaining)
                 {
                     var targetRemaining = target.RemainingCellValues.Where(v=>!pair.commonRemaining.Contains(v)).ToArray();
-                    result.Add(new HiddenRemaining(
+                    result.Add(new CellsToUpdate(
                         new []{target}, 
                         targetRemaining));
                 }
