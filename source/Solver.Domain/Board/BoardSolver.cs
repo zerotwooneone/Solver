@@ -134,7 +134,7 @@ public class BoardSolver
 
             if (row.TryGetHidden(out var rowPair))
             {
-                hasChanged = HandleHiddenRemaining(rowPair.Value) || hasChanged;
+                hasChanged = HandleCellsToUpdate(rowPair.Value) || hasChanged;
             }
             
             if (row.TryGetNaked(out var rowNaked))
@@ -175,7 +175,7 @@ public class BoardSolver
 
             if (tempColumn.TryGetHidden(out var columnPair))
             {
-                hasChanged = HandleHiddenRemaining(columnPair.Value) || hasChanged;
+                hasChanged = HandleCellsToUpdate(columnPair.Value) || hasChanged;
             }
             
             if (tempColumn.TryGetNaked(out var columnNaked))
@@ -190,7 +190,7 @@ public class BoardSolver
             var tempRegion = regions[tempRegionCoordinates.rowIndex, tempRegionCoordinates.columnIndex];
             if (tempRegion.TryGetHidden(out var regionPair))
             {
-                hasChanged = HandleHiddenRemaining(regionPair.Value) || hasChanged;
+                hasChanged = HandleCellsToUpdate(regionPair.Value) || hasChanged;
             }
             
             if (tempRegion.TryGetNaked(out var regionNaked))
@@ -203,25 +203,6 @@ public class BoardSolver
         }
 
         return hasChanged;
-    }
-    
-    private static bool HandleHiddenRemaining(NineCellExtensions.HiddenRemaining hiddenRemaining)
-    {
-        if (hiddenRemaining.Cells.Count == 1 &&
-            hiddenRemaining.NewRemainingValues.Count == 1)
-        {
-            return hiddenRemaining.Cells.First()
-                .TrySetCellAsSolved(hiddenRemaining.NewRemainingValues.First());
-        }
-        bool didChange = false;
-        var cells = hiddenRemaining.Cells;
-        foreach (var cell in cells)
-        {
-            didChange = cell.TryReduceRemaining(hiddenRemaining.NewRemainingValues) || didChange;
-            didChange = cell.TrySolveFromRemaining() || didChange;
-        }
-
-        return didChange;
     }
     
     private static bool HandleCellsToUpdate(NineCellExtensions.CellsToUpdate cellsToUpdate)

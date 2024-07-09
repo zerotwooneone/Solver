@@ -68,14 +68,6 @@ public static class NineCellExtensions
         return (remaining, existing);
     }
     
-    public readonly struct HiddenRemaining(
-        IReadOnlyCollection<MutableCell> cells,
-        IReadOnlyCollection<CellValue> newRemainingValues)
-    {
-        public IReadOnlyCollection<MutableCell> Cells { get; } = cells;
-        public IReadOnlyCollection<CellValue> NewRemainingValues { get; } = newRemainingValues;
-    }
-    
     public readonly struct CellsToUpdate(
         IReadOnlyCollection<ICell> cells,
         IReadOnlyCollection<CellValue> newRemainingValues)
@@ -85,8 +77,8 @@ public static class NineCellExtensions
     }
 
     public static bool TryGetHidden(
-        this IReadOnlyList<MutableCell> cells,
-        out HiddenRemaining? result)
+        this IReadOnlyList<ICell> cells,
+        out CellsToUpdate? result)
     {
         for (var firstIndex = 0; firstIndex < cells.Count - 1; firstIndex++)
         {
@@ -119,7 +111,7 @@ public static class NineCellExtensions
                         //todo: try to remove this check
                         if (cells.FirstOrDefault(c => c.Value == distinctIntersect3[0]) == null)
                         {
-                            result = new HiddenRemaining(new []{first} , new []{distinctIntersect3[0]});
+                            result = new CellsToUpdate(new []{first} , new []{distinctIntersect3[0]});
                             return true;
                         }
                     }
@@ -175,7 +167,7 @@ public static class NineCellExtensions
                         continue;
                     }
 
-                    result = result = new HiddenRemaining(new []{first, second, third} , new []{distinctIntersect3[0], distinctIntersect3[1], distinctIntersect3[2]});
+                    result = result = new CellsToUpdate(new []{first, second, third} , new []{distinctIntersect3[0], distinctIntersect3[1], distinctIntersect3[2]});
                     return true;
                 }
 
@@ -211,7 +203,7 @@ public static class NineCellExtensions
                     continue;
                 }
 
-                result =result = new HiddenRemaining(new []{first, second} , new []{distinctIntersect[0], distinctIntersect[1]});
+                result =result = new CellsToUpdate(new []{first, second} , new []{distinctIntersect[0], distinctIntersect[1]});
                 return true;
             }
         }
