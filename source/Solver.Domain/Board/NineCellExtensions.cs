@@ -174,7 +174,7 @@ public static class NineCellExtensions
                 var intersect = first.RemainingCellValues
                     .Intersect(second.RemainingCellValues)
                     .ToArray();
-                if (intersect.Length != 2)
+                if (intersect.Length < 3)
                 {
                     continue;
                 }
