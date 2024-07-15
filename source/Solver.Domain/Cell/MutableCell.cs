@@ -15,7 +15,6 @@ public class MutableCell(CellValue? initialValue, IEnumerable<CellValue> remaini
     public HashSet<CellValue> RemainingCellValues { get;  } = [..remainingCellValues];
     IReadOnlySet<CellValue> ICell.RemainingCellValues => RemainingCellValues;
     
-    public bool HasChanged { get; set; } = false;
     public override string ToString()
     {
         return ((ICell)this).MonoSpacedString;
