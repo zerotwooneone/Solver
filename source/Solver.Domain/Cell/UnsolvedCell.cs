@@ -1,16 +1,21 @@
-﻿namespace Solver.Domain.Cell;
+﻿using Solver.Domain.Board;
 
-public abstract class UnsolvedCell 
+namespace Solver.Domain.Cell;
+
+public class UnsolvedCell(
+    IRow row,
+    IColumn column,
+    IRegion region)  : ICell
 {
-    public static readonly ICell Instance = new UnsolvedCell_Internal();
-    private class UnsolvedCell_Internal : ICell
+    public IRow Row { get; } = row;
+    public IColumn Column { get; } = column;
+    public IRegion Region { get; } = region;
+    public CellValue? Value => null;
+    private static readonly HashSet<CellValue> All = new(CellValue.AllValues);
+    public IReadOnlySet<CellValue> RemainingCellValues => All;
+    public override string ToString()
     {
-        public CellValue? Value => null;
-        private static readonly HashSet<CellValue> All = new(CellValue.AllValues);
-        public IReadOnlySet<CellValue> RemainingCellValues => All;
-        public override string ToString()
-        {
-            return ICell.MonoSpacedBlank;
-        }
+        return ICell.MonoSpacedBlank;
     }
+    
 }

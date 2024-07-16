@@ -1,4 +1,6 @@
-﻿namespace Solver.Domain.Cell;
+﻿using Solver.Domain.Board;
+
+namespace Solver.Domain.Cell;
 
 public interface ICell 
 {
@@ -6,6 +8,9 @@ public interface ICell
     
     IReadOnlySet<CellValue> RemainingCellValues { get; }
     
+    IRow Row { get; }
+    IColumn Column { get; }
+    IRegion Region { get; }
     
     public const string MonoSpacedBlank = "_";
     public const string MonoSpacedUnsolved = "+";

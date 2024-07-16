@@ -6,11 +6,14 @@ public class MutableCell(CellValue? initialValue, IEnumerable<CellValue> remaini
 {
     public CellValue? Value { get; set; } = initialValue;
     public MutableNineCell Row { get; } = row;
+    IRow ICell.Row => Row;
     public MutableNineCell Column { get; } = column;
+    IColumn ICell.Column => Column;
     public MutableNineCell Region { get; } = region;
-    public int RowIndex => Row.Index;
-    public int ColumnIndex => Column.Index;
-    public int RegionIndex => Region.Index;
+    IRegion ICell.Region => Region;
+    
+    public static HashSet<CellValue> GetAllCellValues() => new(CellValue.AllValues);
+    public static readonly HashSet<CellValue> EmptyRemainingValues = new(0);
 
     public HashSet<CellValue> RemainingCellValues { get;  } = [..remainingCellValues];
     IReadOnlySet<CellValue> ICell.RemainingCellValues => RemainingCellValues;
@@ -124,5 +127,24 @@ public class MutableCell(CellValue? initialValue, IEnumerable<CellValue> remaini
     public bool TryRemoveRemaining(CellValue value)
     {
         return RemainingCellValues.Remove(value);
+    }
+    
+    public override bool Equals(object? obj)
+    {
+        if (obj is null) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if(obj is not ICell cell) return false;
+
+        var coordsMatch = Row.Index == cell.Row.Index && 
+                Column.Index == cell.Column.Index
+            /*&& Region.Index == cell.Region.Index*/;
+        return Value.HasValue
+            ? coordsMatch && Value == cell.Value
+            : coordsMatch;
+    }
+    
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Row.Index, Column.Index, Value);
     }
 }

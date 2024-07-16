@@ -1,9 +1,18 @@
-﻿namespace Solver.Domain.Cell;
+﻿using Solver.Domain.Board;
 
-public class SolvedCell(CellValue initialValue) : ICell
+namespace Solver.Domain.Cell;
+
+public class SolvedCell(
+    CellValue initialValue,
+    IRow row,
+    IColumn column,
+    IRegion region) : ICell
 {
     public CellValue? Value { get; } = initialValue;
-    private static readonly HashSet<CellValue> Empty = new();
+    public IRow Row { get; } = row;
+    public IColumn Column { get; } = column;
+    public IRegion Region { get; } = region;
+    public static readonly HashSet<CellValue> Empty = new(0);
     public IReadOnlySet<CellValue> RemainingCellValues => Empty;
 
     public override string ToString()

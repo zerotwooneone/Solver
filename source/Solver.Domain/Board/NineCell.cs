@@ -5,17 +5,21 @@ namespace Solver.Domain.Board;
 
 public class NineCell : IRow, IColumn, IRegion
 {
-    public NineCell(IEnumerable<ICell>  cells): this(cells as ICell[]?? cells.ToArray())
+    public int Index { get; }
+
+    public NineCell(int index, IEnumerable<ICell>  cells): this(index,cells as ICell[]?? cells.ToArray())
     {
     }
 
-    public NineCell(params ICell[] cells)
+    public NineCell(int index, params ICell[] cells)
     {
         if (cells.Length != 9)
         {
             throw new ArgumentException("NineCell must have exactly 9 cells", nameof(cells));
         }
-        
+
+        Index = index;
+
         A = cells[0];
         B = cells[1];
         C = cells[2];
@@ -27,15 +31,15 @@ public class NineCell : IRow, IColumn, IRegion
         I = cells[8];
     }
 
-    public ICell A { get; } = UnsolvedCell.Instance;
-    public ICell B { get; } = UnsolvedCell.Instance;
-    public ICell C { get; } = UnsolvedCell.Instance;
-    public ICell D { get; } = UnsolvedCell.Instance;
-    public ICell E { get; } = UnsolvedCell.Instance;
-    public ICell F { get; } = UnsolvedCell.Instance;
-    public ICell G { get; } = UnsolvedCell.Instance;
-    public ICell H { get; } = UnsolvedCell.Instance;
-    public ICell I { get; } = UnsolvedCell.Instance;
+    public ICell A { get; }
+    public ICell B { get; }
+    public ICell C { get; }
+    public ICell D { get; }
+    public ICell E { get; }
+    public ICell F { get; }
+    public ICell G { get; }
+    public ICell H { get; }
+    public ICell I { get; }
     
     public int Count => 9;
     public override string ToString()

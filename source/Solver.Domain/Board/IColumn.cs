@@ -5,6 +5,7 @@ namespace Solver.Domain.Board;
 
 public interface IColumn : IReadOnlyList<ICell>
 {
+    int Index { get; }
     ICell A { get; }
     ICell B { get; }
     ICell C { get; }

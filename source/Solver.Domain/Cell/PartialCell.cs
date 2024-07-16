@@ -1,8 +1,18 @@
-﻿namespace Solver.Domain.Cell;
+﻿using Solver.Domain.Board;
 
-public class PartialCell(CellValue? initialValue, IEnumerable<CellValue> remainingValues) : ICell
+namespace Solver.Domain.Cell;
+
+public class PartialCell(
+    CellValue? initialValue, 
+    IEnumerable<CellValue> remainingValues,
+    IRow row,
+    IColumn column,
+    IRegion region) : ICell
 {
     public CellValue? Value { get; } = initialValue;
+    public IRow Row { get; } = row;
+    public IColumn Column { get; } = column;
+    public IRegion Region { get; } = region;
     public IReadOnlySet<CellValue> RemainingCellValues { get; } = new HashSet<CellValue>(remainingValues);
 
     public override string ToString()
